@@ -1,4 +1,6 @@
-import domain.account.Artist;
+import controller.ArtistController;
+import controller.MusicController;
+import controller.SubscriberController;
 import domain.account.Subscriber;
 import domain.content.Music;
 import service.ArtistService;
@@ -11,23 +13,31 @@ import java.util.Scanner;
 import static java.lang.System.exit;
 
 public class Application {
-
-    private static SubscriberService subscriberService;
-    private static MusicService musicService;
-    private static ArtistService artistService;
     
     private static Scanner scanner;
 
-    public static void main(String[] args) {
-        subscriberService = new SubscriberService();
-        musicService = new MusicService();
-        artistService = new ArtistService();
+    private static SubscriberService subscriberService;
+    private static SubscriberController subscriberController;
+    private static ArtistController artistController;
+    private static MusicController musicController;
+
+    private static void init() {
         scanner = new Scanner(System.in);
 
-        // 첫 화면
-        System.out.print(" === 음악 스트리밍 서비스 앱 시작 === \n\n");
+        subscriberService = new SubscriberService();
+        subscriberController = new SubscriberController(scanner, subscriberService);
+        artistController = new ArtistController(scanner, new ArtistService());
+        musicController = new MusicController(scanner, new MusicService());
+    }
 
-        // 가입
+    public static void main(String[] args) throws InterruptedException {
+        // 생성자 주입
+        init();
+
+        // 첫 화면
+        System.out.print("\n === 음악 스트리밍 서비스 앱 시작 === \n\n");
+
+        // 회원가입 및 로그인
         Subscriber subscriber;
 
         while(true) {
@@ -35,26 +45,11 @@ public class Application {
             String answer = scanner.nextLine().trim();
 
             if (answer.equalsIgnoreCase("y")) {
-                System.out.print("이름을 입력해주세요: ");
-                String name = scanner.nextLine().trim();
-
-                System.out.print("이메일을 입력해주세요: ");
-                String email = scanner.nextLine().trim();
-
-                System.out.print("비밀번호를 입력해주세요: ");
-                String password = scanner.nextLine().trim();
-
-                subscriber = subscriberService.signUp(name, email, password);
+                subscriber = subscriberController.signUp();
                 break;
 
             } else if (answer.equalsIgnoreCase("n")) {
-                System.out.print("이메일을 입력해주세요: ");
-                String email = scanner.nextLine().trim();
-
-                System.out.print("비밀번호를 입력해주세요: ");
-                String password = scanner.nextLine().trim();
-
-                subscriber = subscriberService.signIn(email, password);
+                subscriber = subscriberController.signIn();
                 break;
 
             } else {
@@ -68,7 +63,7 @@ public class Application {
         }
 
         while (true) {
-            System.out.print(" === 메인 페이지로 이동 === \n\n");
+            System.out.print("\n === 메인 페이지로 이동 === \n\n");
 
             System.out.println("""
                     0. 앱 종료
@@ -76,19 +71,17 @@ public class Application {
                     2. 아티스트 검색
                     3. 내 정보
                     """);
+
             System.out.print("원하는 작업의 번호를 입력하세요: ");
             int answer = Integer.parseInt(scanner.nextLine().trim());
 
             switch (answer) {
                 case 0:
-                    System.out.println("앱을 종료합니다.");
+                    System.out.print("\n === 음악 스트리밍 서비스 앱 종료 === \n\n");
                     exit(0);
 
                 case 1:
-                    System.out.print("노래의 제목을 입력하세요: ");
-                    String title = scanner.nextLine().trim();
-
-                    Music music = musicService.searchByTitle(title);
+                    Music music = musicController.searchByTitle();
                     if (music == null) {
                         System.out.println();
                         break;
@@ -98,7 +91,7 @@ public class Application {
                     String answer2 = scanner.nextLine().trim();
 
                     if (answer2.equalsIgnoreCase("y")) {
-                        System.out.println(music.getTitle() + "이(가) 재생 중입니다.\n");
+                        musicController.playMusic(music);
 
                     } else if (answer2.equalsIgnoreCase("n")) {
                         System.out.println("작업 선택 화면으로 돌아갑니다.\n");
@@ -110,18 +103,10 @@ public class Application {
                     break;
 
                 case 2:
-                    System.out.print("아티스트 이름을 입력하세요: ");
-                    String stageName = scanner.nextLine().trim();
-
-                    Artist artist = artistService.searchByStageName(stageName);
-                    if (artist == null) {
-                        break;
-                    }
-
-                    Map<String, String> artistProfile = artistService.getArtistProfile(artist);
+                    Map<String, String> artistProfile = artistController.searchArtistProfile();
 
                     // 프로필 출력
-                    System.out.print(" === 아티스트 홈 페이지로 이동 === \n\n");
+                    System.out.print("\n === 아티스트 홈 페이지로 이동 === \n\n");
                     printProfile(artistProfile);
                     break;
 
@@ -129,7 +114,7 @@ public class Application {
                     Map<String, String> myProfile = subscriberService.getMyProfile(subscriber);
 
                     // 프로필 출력
-                    System.out.print(" === 마이 홈 페이지로 이동 === \n\n");
+                    System.out.print("\n === 마이 홈 페이지로 이동 === \n\n");
                     printProfile(myProfile);
                     break;
 
@@ -144,6 +129,6 @@ public class Application {
         for  (Map.Entry<String, String> entry : profile.entrySet()) {
             stringBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
         }
-        System.out.println(stringBuilder);
+        System.out.print(stringBuilder);
     }
 }

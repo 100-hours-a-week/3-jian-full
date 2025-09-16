@@ -17,4 +17,8 @@ public class Music extends Audio {
     public Music(String title) {
         super(title);
     }
+
+    public List<String> getLyrics() {
+        return lyrics;
+    }
 }

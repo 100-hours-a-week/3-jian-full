@@ -22,6 +22,10 @@ public class ArtistService {
     }
 
     public Map<String, String> getArtistProfile(Artist artist) {
+        if (artist == null) {
+            return Map.of("error", "아티스트의 정보가 존재하지 않습니다.");
+        }
+
         Map<String, String> result = new HashMap<>();
 
         result.put("stageName", artist.getStageName());
