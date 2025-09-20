@@ -6,10 +6,7 @@ import repository.SubscriberRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SubscriberService {
 
@@ -54,8 +51,8 @@ public class SubscriberService {
         return subscriber;
     }
 
-    public Map<String, String> getMyProfile(Subscriber subscriber) {
-        Map<String, String> myProfile = new HashMap<>();
+    public Map<String, String> getSubscriberProfile(Subscriber subscriber) {
+        Map<String, String> myProfile = new LinkedHashMap<>();
 
         myProfile.put("이메일", subscriber.getEmail());
         myProfile.put("이름", subscriber.getName());

@@ -24,4 +24,8 @@ public class ArtistController {
         Artist artist = artistService.searchByStageName(stageName);
         return artistService.getArtistProfile(artist);
     }
+
+    public Artist createArtist(String stageName, String genre, String description) {
+        return artistService.createArtist(stageName, genre, description);
+    }
 }

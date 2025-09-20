@@ -1,35 +1,40 @@
 package controller;
 
+import domain.account.Artist;
 import domain.content.Music;
+import infra.Mp3Player;
+import javazoom.jl.decoder.JavaLayerException;
 import service.MusicService;
 
-import java.util.List;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class MusicController {
 
     private final Scanner scanner;
 
+    private final Mp3Player mp3Player;
     private final MusicService musicService;
 
     public MusicController(Scanner scanner, MusicService musicService) {
         this.scanner = scanner;
         this.musicService = musicService;
+        this.mp3Player = new Mp3Player();
     }
 
-    public void playMusic(Music music) throws InterruptedException {
-        System.out.println(music.getTitle() + "이(가) 재생 중입니다.");
+    public void playMusic(Music music) {
+        String fullPath = music.getFilePath() + music.getFileName();
 
-        List<String> lyrics = music.getLyrics();
-        if (lyrics == null || lyrics.isEmpty()) {
-            System.out.println(music.getTitle() + "의 가사가 지원되지 않습니다.");
-            return;
-        }
+        try {
+            mp3Player.startPlayer(fullPath);
 
-        for (String lyric : lyrics) {
-            System.out.println(lyric);
-            Thread.sleep(500); // 줄 사이에 0.5초 대기
+        } catch (JavaLayerException | FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public void stopMusic() {
+        mp3Player.stopPlayer();
     }
 
     public Music searchByTitle() {
@@ -37,5 +42,9 @@ public class MusicController {
         String title = scanner.nextLine().trim();
 
         return musicService.searchByTitle(title);
+    }
+
+    public Music createMusic(Artist artist, String title, String filePath, String fileName) {
+        return musicService.createMusic(artist, title, filePath, fileName);
     }
 }

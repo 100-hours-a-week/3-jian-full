@@ -1,2 +1,8 @@
+# IntelliJ
 .idea
+*.iml
 /out/
+
+# macOS
+.DS_Store
+**/.DS_Store

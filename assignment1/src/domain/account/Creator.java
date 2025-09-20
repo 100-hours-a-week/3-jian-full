@@ -26,13 +26,10 @@ public class Creator extends User {
         return XLink;
     }
 
-    public Creator(
-            String description, String facebookLink, String instagramLink, String XLink
-    ) {
+    private Creator() {}
+
+    public Creator(String description) {
         this.description = description;
-        this.facebookLink = facebookLink;
-        this.instagramLink = instagramLink;
-        this.XLink = XLink;
         this.isVerified = false;
     }
 }

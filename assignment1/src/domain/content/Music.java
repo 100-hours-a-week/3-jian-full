@@ -14,8 +14,9 @@ public class Music extends Audio {
     private LocalDate releaseDate;
     private List<String> lyrics;
 
-    public Music(String title) {
-        super(title);
+    public Music(Artist artist, String title, String filePath, String fileName) {
+        super(title, filePath, fileName);
+        this.artist = artist;
     }
 
     public List<String> getLyrics() {

@@ -1,5 +1,6 @@
 package service;
 
+import domain.account.Artist;
 import domain.content.Music;
 import repository.MusicRepository;
 
@@ -17,5 +18,10 @@ public class MusicService {
             return null;
         }
         return music.get();
+    }
+
+    public Music createMusic(Artist artist, String title, String filePath, String fileName) {
+        Music music = new Music(artist, title, filePath, fileName);
+        return musicRepository.save(music);
     }
 }

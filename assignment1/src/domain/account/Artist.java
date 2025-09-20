@@ -15,12 +15,8 @@ public class Artist extends Creator {
         return genre;
     }
 
-    public Artist(
-            String description,
-            String facebookLink, String instagramLink, String XLink,
-            String stageName, String genre
-    ) {
-        super(description, facebookLink, instagramLink, XLink);
+    public Artist(String stageName, String genre, String description) {
+        super(description);
         this.stageName = stageName;
         this.genre = genre;
     }

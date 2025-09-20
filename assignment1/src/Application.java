@@ -1,11 +1,13 @@
 import controller.ArtistController;
 import controller.MusicController;
 import controller.SubscriberController;
+import domain.account.Artist;
 import domain.account.Subscriber;
 import domain.content.Music;
 import service.ArtistService;
 import service.MusicService;
 import service.SubscriberService;
+import view.MusicViewController;
 
 import java.util.Map;
 import java.util.Scanner;
@@ -20,6 +22,7 @@ public class Application {
     private static SubscriberController subscriberController;
     private static ArtistController artistController;
     private static MusicController musicController;
+    private static MusicViewController musicViewController;
 
     private static void init() {
         scanner = new Scanner(System.in);
@@ -28,13 +31,37 @@ public class Application {
         subscriberController = new SubscriberController(scanner, subscriberService);
         artistController = new ArtistController(scanner, new ArtistService());
         musicController = new MusicController(scanner, new MusicService());
+        musicViewController = new MusicViewController(scanner, musicController);
     }
 
     public static void main(String[] args) throws InterruptedException {
         // 생성자 주입
         init();
 
-        // 첫 화면
+        // repository 초기화
+        Artist artist1 = artistController.createArtist(
+                "Lite Saturation",
+                "Dance",
+                "Hello, this is Lite Saturation.");
+        Artist artist2 = artistController.createArtist(
+                "Mr Smith",
+                "Blues",
+                "We play blues music.");
+
+        Music music1 = musicController.createMusic(
+                artist1,
+                "Dance Party",
+                "/Users/gy/Study/3-jian-full/assignment1/resources/music/",
+                "Lite Saturation - Dance Party.mp3"
+        );
+        Music music2 = musicController.createMusic(
+                artist2,
+                "Moonshine Blues",
+                "/Users/gy/Study/3-jian-full/assignment1/resources/music/",
+                "Mr Smith - Moonshine Blues.mp3"
+        );
+
+        // 시작 화면
         System.out.print("\n === 음악 스트리밍 서비스 앱 시작 === \n\n");
 
         // 회원가입 및 로그인
@@ -62,8 +89,9 @@ public class Application {
             exit(0);
         }
 
+        // 메인 화면
         while (true) {
-            System.out.print("\n === 메인 페이지로 이동 === \n\n");
+            System.out.print("\n === 메인 화면으로 이동 === \n\n");
 
             System.out.println("""
                     0. 앱 종료
@@ -87,34 +115,25 @@ public class Application {
                         break;
                     }
 
-                    System.out.print("노래를 재생하시겠습니까? (y/n): ");
-                    String answer2 = scanner.nextLine().trim();
-
-                    if (answer2.equalsIgnoreCase("y")) {
-                        musicController.playMusic(music);
-
-                    } else if (answer2.equalsIgnoreCase("n")) {
-                        System.out.println("작업 선택 화면으로 돌아갑니다.\n");
-
-                    } else {
-                        System.out.println("유효하지 않은 입력값입니다. 다시 입력해주세요.\n");
-                    }
+                    // 음악 화면
+                    musicViewController.printProfile(music);
+                    musicViewController.menu(music);
 
                     break;
 
                 case 2:
                     Map<String, String> artistProfile = artistController.searchArtistProfile();
 
-                    // 프로필 출력
-                    System.out.print("\n === 아티스트 홈 페이지로 이동 === \n\n");
+                    // 아티스트 홈
+                    System.out.print("\n === 아티스트 홈으로 이동 === \n\n");
                     printProfile(artistProfile);
                     break;
 
                 case 3:
-                    Map<String, String> myProfile = subscriberService.getMyProfile(subscriber);
+                    Map<String, String> myProfile = subscriberService.getSubscriberProfile(subscriber);
 
-                    // 프로필 출력
-                    System.out.print("\n === 마이 홈 페이지로 이동 === \n\n");
+                    // 마이 홈
+                    System.out.print("\n === 마이 홈으로 이동 === \n\n");
                     printProfile(myProfile);
                     break;
 
