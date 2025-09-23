@@ -7,6 +7,8 @@ import domain.content.Music;
 import service.ArtistService;
 import service.MusicService;
 import service.SubscriberService;
+import validator.MenuSelectionValidator;
+import view.MainViewController;
 import view.MusicViewController;
 
 import java.util.Map;
@@ -22,6 +24,8 @@ public class Application {
     private static SubscriberController subscriberController;
     private static ArtistController artistController;
     private static MusicController musicController;
+
+    private static MainViewController mainViewController;
     private static MusicViewController musicViewController;
 
     private static void init() {
@@ -31,6 +35,8 @@ public class Application {
         subscriberController = new SubscriberController(scanner, subscriberService);
         artistController = new ArtistController(scanner, new ArtistService());
         musicController = new MusicController(scanner, new MusicService());
+
+        mainViewController = new MainViewController(scanner, new MenuSelectionValidator());
         musicViewController = new MusicViewController(scanner, musicController);
     }
 
@@ -91,17 +97,8 @@ public class Application {
 
         // 메인 화면
         while (true) {
-            System.out.print("\n === 메인 화면으로 이동 === \n\n");
-
-            System.out.println("""
-                    0. 앱 종료
-                    1. 노래 검색
-                    2. 아티스트 검색
-                    3. 내 정보
-                    """);
-
-            System.out.print("원하는 작업의 번호를 입력하세요: ");
-            int answer = Integer.parseInt(scanner.nextLine().trim());
+            mainViewController.printMenu();
+            int answer = mainViewController.selectMenu();
 
             switch (answer) {
                 case 0:
