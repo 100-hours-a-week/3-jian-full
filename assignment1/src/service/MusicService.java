@@ -8,7 +8,11 @@ import java.util.Optional;
 
 public class MusicService {
 
-    private final MusicRepository musicRepository =  new MusicRepository();
+    private final MusicRepository musicRepository;
+
+    public MusicService(MusicRepository musicRepository) {
+        this.musicRepository = musicRepository;
+    }
 
     public Music searchByTitle(String title) {
         Optional<Music> music = musicRepository.getByTitle(title);

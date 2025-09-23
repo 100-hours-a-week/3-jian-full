@@ -4,6 +4,9 @@ import controller.SubscriberController;
 import domain.account.Artist;
 import domain.account.Subscriber;
 import domain.content.Music;
+import repository.ArtistRepository;
+import repository.MusicRepository;
+import repository.SubscriberRepository;
 import service.ArtistService;
 import service.MusicService;
 import service.SubscriberService;
@@ -31,10 +34,13 @@ public class Application {
     private static void init() {
         scanner = new Scanner(System.in);
 
-        subscriberService = new SubscriberService();
+        ArtistService artistService = new ArtistService(new ArtistRepository());
+        MusicService musicService = new MusicService(new MusicRepository());
+        subscriberService = new SubscriberService(new SubscriberRepository());
+
         subscriberController = new SubscriberController(scanner, subscriberService);
-        artistController = new ArtistController(scanner, new ArtistService());
-        musicController = new MusicController(scanner, new MusicService());
+        artistController = new ArtistController(scanner, artistService);
+        musicController = new MusicController(scanner, musicService);
 
         mainViewController = new MainViewController(scanner, new MenuSelectionValidator());
         musicViewController = new MusicViewController(scanner, musicController);

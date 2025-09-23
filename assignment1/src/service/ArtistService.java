@@ -9,7 +9,11 @@ import java.util.Optional;
 
 public class ArtistService {
 
-    private final ArtistRepository artistRepository =  new ArtistRepository();
+    private final ArtistRepository artistRepository;
+
+    public ArtistService(ArtistRepository artistRepository) {
+        this.artistRepository = artistRepository;
+    }
 
     public Artist searchByStageName(String stageName) {
         Optional<Artist> artist = artistRepository.getByStageName(stageName);

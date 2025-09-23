@@ -10,7 +10,11 @@ import java.util.*;
 
 public class SubscriberService {
 
-    private final SubscriberRepository subscriberRepository =  new SubscriberRepository();
+    private final SubscriberRepository subscriberRepository;
+
+    public SubscriberService(SubscriberRepository subscriberRepository) {
+        this.subscriberRepository = subscriberRepository;
+    }
 
     public Subscriber signUp(String name, String email, String password) {
         Optional<Subscriber> subscriber = subscriberRepository.getByEmail(email);
