@@ -2,13 +2,13 @@ package repository;
 
 import domain.account.Subscriber;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SubscriberRepository {
 
-    private static Set<Subscriber> subscriberSet = new HashSet<>();
+    private final Set<Subscriber> subscriberSet = ConcurrentHashMap.newKeySet();
 
     public Subscriber save(Subscriber subscriber) {
         subscriberSet.add(subscriber);

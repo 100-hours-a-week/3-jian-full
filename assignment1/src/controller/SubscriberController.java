@@ -3,6 +3,7 @@ package controller;
 import domain.account.Subscriber;
 import service.SubscriberService;
 
+import java.util.Map;
 import java.util.Scanner;
 
 public class SubscriberController {
@@ -37,5 +38,9 @@ public class SubscriberController {
         String password = scanner.nextLine().trim();
 
         return subscriberService.signIn(email, password);
+    }
+
+    public void printProfile(Subscriber subscriber) {
+        subscriberService.getSubscriberProfile(subscriber);
     }
 }

@@ -2,13 +2,13 @@ package repository;
 
 import domain.content.Music;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MusicRepository {
 
-    private static final Set<Music> musicSet = new HashSet<>();
+    private final Set<Music> musicSet = ConcurrentHashMap.newKeySet();
 
     public Music save(Music music) {
         if (musicSet.add(music)) return music;

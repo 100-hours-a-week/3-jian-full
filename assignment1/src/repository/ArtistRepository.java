@@ -2,13 +2,13 @@ package repository;
 
 import domain.account.Artist;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ArtistRepository {
 
-    private static final Set<Artist> artistSet = new HashSet<>();
+    private final Set<Artist> artistSet = ConcurrentHashMap.newKeySet();
 
     public Artist save(Artist artist) {
         if (artistSet.add(artist)) return artist;
