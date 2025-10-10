@@ -6,6 +6,7 @@ import com.jian.community.domain.exception.BadRequestException;
 import com.jian.community.domain.exception.NotFoundException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
+import com.jian.community.presentation.dto.AvailabilityResponse;
 import com.jian.community.presentation.dto.CreateUserRequest;
 import lombok.AllArgsConstructor;
 
@@ -59,5 +60,15 @@ public class UserService {
                 request.profileImageUrl()
         );
         userRepository.save(user);
+    }
+
+    public AvailabilityResponse validateEmail(String email) {
+        boolean isAvailable = userRepository.existsByEmail(email);
+        return new AvailabilityResponse(isAvailable);
+    }
+
+    public AvailabilityResponse validateNickname(String nickname) {
+        boolean isAvailable = userRepository.existsByNickname(nickname);
+        return new AvailabilityResponse(isAvailable);
     }
 }

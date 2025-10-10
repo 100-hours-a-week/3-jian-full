@@ -58,4 +58,18 @@ public class UserInMemoryRepository implements UserRepository {
     public boolean existsById(Long userId) {
         return delegate.existsById(userId);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        Long id = emailIndex.get(email);
+        if (id == null) return false;
+        return delegate.existsById(id);
+    }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        Long id = nicknameIndex.get(nickname);
+        if (id == null) return false;
+        return delegate.existsById(id);
+    }
 }

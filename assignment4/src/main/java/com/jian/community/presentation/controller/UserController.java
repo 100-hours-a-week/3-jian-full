@@ -1,6 +1,7 @@
 package com.jian.community.presentation.controller;
 
 import com.jian.community.application.service.UserService;
+import com.jian.community.presentation.dto.AvailabilityResponse;
 import com.jian.community.presentation.dto.CreateUserRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -18,5 +19,17 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
+    }
+
+    @GetMapping("/emails/availability")
+    @ResponseStatus(HttpStatus.OK)
+    public AvailabilityResponse validateEmail(@RequestParam String email) {
+        return userService.validateEmail(email);
+    }
+
+    @GetMapping("/nicknames/availability")
+    @ResponseStatus(HttpStatus.OK)
+    public AvailabilityResponse validateNickname(@RequestParam String nickname) {
+        return userService.validateNickname(nickname);
     }
 }
