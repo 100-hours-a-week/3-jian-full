@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: community
+
+security:
+  bcrypt:
+    cost: 4
