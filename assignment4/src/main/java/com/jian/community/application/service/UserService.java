@@ -6,11 +6,10 @@ import com.jian.community.domain.exception.BadRequestException;
 import com.jian.community.domain.exception.NotFoundException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
+import com.jian.community.presentation.dto.CreateUserRequest;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @AllArgsConstructor
@@ -18,8 +17,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public void signUp(User user){}
 
     public Long authenticate(String email, String password) {
         User user = userRepository.findByEmail(email)
@@ -35,5 +32,32 @@ public class UserService {
             );
         }
         return user.getId();
+    }
+
+    public void createUser(CreateUserRequest request) {
+        userRepository.findByEmail(request.email())
+                .ifPresent(user -> {
+                    throw new BadRequestException(
+                            ErrorCode.USER_ALREADY_EXISTS,
+                            "이미 사용 중인 이메일입니다."
+                    );
+                });
+
+        userRepository.findByNickname(request.nickname())
+                .ifPresent(user -> {
+                    throw new BadRequestException(
+                            ErrorCode.USER_ALREADY_EXISTS,
+                            "이미 사용 중인 닉네임입니다."
+                    );
+                });
+
+        String encodedPassword = passwordEncoder.encode(request.password());
+        User user = User.of(
+                request.email(),
+                encodedPassword,
+                request.nickname(),
+                request.profileImageUrl()
+        );
+        userRepository.save(user);
     }
 }

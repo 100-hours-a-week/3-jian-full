@@ -16,6 +16,7 @@ public class UserInMemoryRepository implements UserRepository {
 
     private final InMemoryRepository<User> delegate;
     private final Map<String, Long> emailIndex  = new ConcurrentHashMap<>();
+    private final Map<String, Long> nicknameIndex = new ConcurrentHashMap<>();
 
     public UserInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -25,6 +26,7 @@ public class UserInMemoryRepository implements UserRepository {
     public User save(User user) {
         User saved = delegate.save(user);
         emailIndex.put(saved.getEmail(), saved.getId());
+        nicknameIndex.put(saved.getNickname(), saved.getId());
         return saved;
     }
 
@@ -36,6 +38,13 @@ public class UserInMemoryRepository implements UserRepository {
     @Override
     public Optional<User> findByEmail(String email) {
         Long id = emailIndex.get(email);
+        if (id == null) return Optional.empty();
+        return delegate.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByNickname(String nickname) {
+        Long id = nicknameIndex.get(nickname);
         if (id == null) return Optional.empty();
         return delegate.findById(id);
     }

@@ -2,14 +2,15 @@ package com.jian.community.presentation.controller;
 
 import com.jian.community.application.service.SessionManager;
 import com.jian.community.application.service.UserService;
-import com.jian.community.presentation.dto.CreateSessionDto;
+import com.jian.community.presentation.dto.CreateSessionRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/sessions")
+@RestController
+@RequestMapping("/sessions")
 @AllArgsConstructor
 public class SessionController {
 
@@ -18,7 +19,7 @@ public class SessionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSession(@RequestBody CreateSessionDto request, HttpServletResponse response) {
+    public void createSession(@RequestBody CreateSessionRequest request, HttpServletResponse response) {
         Long userId = userService.authenticate(request.email(), request.password());
         sessionManager.createSession(userId, response);
     }

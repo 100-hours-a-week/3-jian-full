@@ -1,0 +1,53 @@
+package com.jian.community.infrastructure.disk;
+
+import com.jian.community.application.util.FileStorage;
+import com.jian.community.domain.constant.ErrorCode;
+import com.jian.community.domain.exception.FileStorageException;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
+@Component
+public class DiskFileStorage implements FileStorage {
+
+    private final Path rootDir = Path.of("files");
+
+    public DiskFileStorage() throws IOException {
+        if (!Files.exists(rootDir)) {
+            Files.createDirectories(rootDir);
+        }
+    }
+
+    public String save(MultipartFile file, String subDir) {
+        try {
+            // 디렉토리 생성
+            Path directory = rootDir.resolve(subDir);
+            Files.createDirectories(directory);
+
+            // 고유 파일명 생성 (UUID + 원본 확장자)
+            String extension = getFileExtension(file.getOriginalFilename());
+            String fileName = UUID.randomUUID() + extension;
+
+            Path targetPath = directory.resolve(fileName);
+            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            return targetPath.toString();
+
+        } catch (IOException e) {
+            throw new FileStorageException(
+                    ErrorCode.INTERNAL_SERVER_ERROR,
+                    "파일 저장에 실패했습니다."
+            );
+        }
+    }
+
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "";
+        return filename.substring(filename.lastIndexOf("."));
+    }
+}
