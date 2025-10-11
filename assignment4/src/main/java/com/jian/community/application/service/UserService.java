@@ -36,21 +36,19 @@ public class UserService {
     }
 
     public void createUser(CreateUserRequest request) {
-        userRepository.findByEmail(request.email())
-                .ifPresent(user -> {
-                    throw new BadRequestException(
-                            ErrorCode.USER_ALREADY_EXISTS,
-                            "이미 사용 중인 이메일입니다."
-                    );
-                });
+        if (userRepository.existsByEmail((request.email()))) {
+            throw new BadRequestException(
+                    ErrorCode.USER_ALREADY_EXISTS,
+                    "이미 사용 중인 이메일입니다."
+            );
+        }
 
-        userRepository.findByNickname(request.nickname())
-                .ifPresent(user -> {
-                    throw new BadRequestException(
-                            ErrorCode.USER_ALREADY_EXISTS,
-                            "이미 사용 중인 닉네임입니다."
-                    );
-                });
+        if (userRepository.existsByNickname(request.nickname())) {
+            throw new BadRequestException(
+                    ErrorCode.USER_ALREADY_EXISTS,
+                    "이미 사용 중인 닉네임입니다."
+            );
+        }
 
         String encodedPassword = passwordEncoder.encode(request.password());
         User user = User.of(
@@ -63,12 +61,12 @@ public class UserService {
     }
 
     public AvailabilityResponse validateEmail(String email) {
-        boolean isAvailable = userRepository.existsByEmail(email);
+        boolean isAvailable = !userRepository.existsByEmail(email);
         return new AvailabilityResponse(isAvailable);
     }
 
     public AvailabilityResponse validateNickname(String nickname) {
-        boolean isAvailable = userRepository.existsByNickname(nickname);
+        boolean isAvailable = !userRepository.existsByNickname(nickname);
         return new AvailabilityResponse(isAvailable);
     }
 }

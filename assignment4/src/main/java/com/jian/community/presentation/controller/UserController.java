@@ -3,6 +3,8 @@ package com.jian.community.presentation.controller;
 import com.jian.community.application.service.UserService;
 import com.jian.community.presentation.dto.AvailabilityResponse;
 import com.jian.community.presentation.dto.CreateUserRequest;
+import com.jian.community.presentation.dto.EmailAvailabilityRequest;
+import com.jian.community.presentation.dto.NicknameAvailabilityRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,13 +25,13 @@ public class UserController {
 
     @GetMapping("/emails/availability")
     @ResponseStatus(HttpStatus.OK)
-    public AvailabilityResponse validateEmail(@RequestParam String email) {
-        return userService.validateEmail(email);
+    public AvailabilityResponse validateEmail(@Valid @ModelAttribute EmailAvailabilityRequest request) {
+        return userService.validateEmail(request.email());
     }
 
     @GetMapping("/nicknames/availability")
     @ResponseStatus(HttpStatus.OK)
-    public AvailabilityResponse validateNickname(@RequestParam String nickname) {
-        return userService.validateNickname(nickname);
+    public AvailabilityResponse validateNickname(@Valid @ModelAttribute NicknameAvailabilityRequest request) {
+        return userService.validateNickname(request.nickname());
     }
 }
