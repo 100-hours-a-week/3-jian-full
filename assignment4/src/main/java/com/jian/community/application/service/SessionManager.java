@@ -1,7 +1,7 @@
 package com.jian.community.application.service;
 
 import com.jian.community.domain.constant.ErrorCode;
-import com.jian.community.domain.exception.NotFoundException;
+import com.jian.community.domain.exception.UnauthorizedException;
 import com.jian.community.domain.model.UserSession;
 import com.jian.community.domain.repository.UserSessionRepository;
 import jakarta.servlet.http.Cookie;
@@ -28,13 +28,13 @@ public class SessionManager {
     public void createSession(Long userId, HttpServletResponse response) {
         String sessionId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
-        UserSession userSession = new UserSession(
+        UserSession session = new UserSession(
                 sessionId,
                 userId,
                 now,
                 now.plus(SESSION_TTL)
         );
-        userSessionRepository.save(userSession);
+        userSessionRepository.save(session);
 
         Cookie cookie = new Cookie("JSESSIONID", sessionId);
         cookie.setPath("/");
@@ -42,18 +42,12 @@ public class SessionManager {
         response.addCookie(cookie);
     }
 
-
-
     public void extendSession(HttpServletRequest request) {
-        UserSession userSession = getSession(request)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.SESSION_NOT_EXISTS,
-                        "세션이 만료되었거나 존재하지 않습니다."
-                ));
+        UserSession session = getSession(request);
         LocalDateTime now = LocalDateTime.now();
 
-        userSession.extendSession(now, SESSION_TTL);
-        userSessionRepository.save(userSession);
+        session.extendSession(now, SESSION_TTL);
+        userSessionRepository.save(session);
     }
 
     public void expireSession(HttpServletRequest request) {
@@ -61,8 +55,14 @@ public class SessionManager {
                 .ifPresent(userSessionRepository::deleteBySessionId);
     }
 
-    public Optional<UserSession> getSession(HttpServletRequest request) {
-        return getSessionId(request).flatMap(userSessionRepository::findBySessionId);
+    public UserSession getSession(HttpServletRequest request) {
+        Optional<UserSession> session = getSessionId(request)
+                .flatMap(userSessionRepository::findBySessionId);
+
+        return session.orElseThrow(() -> new UnauthorizedException(
+                ErrorCode.SESSION_NOT_EXISTS,
+                "세션이 만료되었거나 존재하지 않습니다."
+        ));
     }
 
     private Optional<String> getSessionId(HttpServletRequest request) {

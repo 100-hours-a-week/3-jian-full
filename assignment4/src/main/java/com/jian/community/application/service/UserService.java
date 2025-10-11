@@ -8,6 +8,7 @@ import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
 import com.jian.community.presentation.dto.AvailabilityResponse;
 import com.jian.community.presentation.dto.CreateUserRequest;
+import com.jian.community.presentation.dto.UserInfoResponse;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -58,6 +59,16 @@ public class UserService {
                 request.profileImageUrl()
         );
         userRepository.save(user);
+    }
+
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        ErrorCode.USER_NOT_EXISTS,
+                        "사용자를 찾을 수 없습니다."
+                ));
+
+        return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
 
     public AvailabilityResponse validateEmail(String email) {
