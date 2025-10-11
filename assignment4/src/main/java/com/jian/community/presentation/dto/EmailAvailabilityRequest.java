@@ -1,14 +1,13 @@
 package com.jian.community.presentation.dto;
 
-import jakarta.validation.constraints.Email;
+import com.jian.community.domain.constant.ValidationMessage;
+import com.jian.community.presentation.validation.EmailFormat;
 import jakarta.validation.constraints.NotBlank;
 
 public record EmailAvailabilityRequest(
 
-        @NotBlank
-        @Email(
-                message = "올바르지 않은 이메일 형식입니다."
-        )
+        @NotBlank(message = ValidationMessage.EMAIL_REQUIRED)
+        @EmailFormat
         String email
 ) {
 }

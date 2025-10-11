@@ -1,4 +1,18 @@
 package com.jian.community.presentation.dto;
 
-public record CreateSessionRequest(String email, String password) {
+import com.jian.community.domain.constant.ValidationMessage;
+import com.jian.community.presentation.validation.EmailFormat;
+import com.jian.community.presentation.validation.PasswordFormat;
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateSessionRequest(
+
+        @NotBlank(message = ValidationMessage.EMAIL_REQUIRED)
+        @EmailFormat
+        String email,
+
+        @NotBlank(message = ValidationMessage.PASSWORD_REQUIRED)
+        @PasswordFormat
+        String password
+) {
 }
