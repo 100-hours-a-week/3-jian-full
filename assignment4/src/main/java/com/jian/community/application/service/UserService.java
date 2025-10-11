@@ -60,6 +60,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
     public UserInfoResponse getUserInfo(Long userId) {
         User user = userRepository.findByIdOrThrow(userId);
         return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());

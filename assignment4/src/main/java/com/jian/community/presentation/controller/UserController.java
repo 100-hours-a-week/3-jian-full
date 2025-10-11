@@ -37,6 +37,13 @@ public class UserController {
         return userService.updateUserInfo(userId, request);
     }
 
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMyAccount(HttpServletRequest httpRequest) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        userService.deleteUser(userId);
+    }
+
     @PutMapping("/me/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeMyPassword(@Valid @RequestBody ChangePasswordRequest request, HttpServletRequest httpRequest) {
