@@ -37,6 +37,13 @@ public class UserController {
         return userService.updateUserInfo(userId, request);
     }
 
+    @PutMapping("/me/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeMyPassword(@Valid @RequestBody ChangePasswordRequest request, HttpServletRequest httpRequest) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        userService.changePassword(userId, request);
+    }
+
     @GetMapping("/emails/availability")
     @ResponseStatus(HttpStatus.OK)
     public AvailabilityResponse validateEmail(@Valid @ModelAttribute EmailAvailabilityRequest request) {

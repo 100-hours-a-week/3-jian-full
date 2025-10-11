@@ -6,10 +6,7 @@ import com.jian.community.domain.exception.BadRequestException;
 import com.jian.community.domain.exception.NotFoundException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
-import com.jian.community.presentation.dto.AvailabilityResponse;
-import com.jian.community.presentation.dto.CreateUserRequest;
-import com.jian.community.presentation.dto.UpdateUserRequest;
-import com.jian.community.presentation.dto.UserInfoResponse;
+import com.jian.community.presentation.dto.*;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -34,6 +31,7 @@ public class UserService {
                     "인증 정보가 올바르지 않습니다."
             );
         }
+
         return user.getId();
     }
 
@@ -63,25 +61,31 @@ public class UserService {
     }
 
     public UserInfoResponse getUserInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.USER_NOT_EXISTS,
-                        "사용자를 찾을 수 없습니다."
-                ));
-
+        User user = userRepository.findByIdOrThrow(userId);
         return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
 
     public UserInfoResponse updateUserInfo(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.USER_NOT_EXISTS,
-                        "사용자를 찾을 수 없습니다."
-                ));
+        User user = userRepository.findByIdOrThrow(userId);
         user.update(request.nickname());
         userRepository.save(user);
 
         return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
+    }
+
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        User user = userRepository.findByIdOrThrow(userId);
+
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            throw new BadRequestException(
+                    ErrorCode.INVALID_CREDENTIALS,
+                    "인증 정보가 올바르지 않습니다."
+            );
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.newPassword());
+        user.changePassword(encodedPassword);
+        userRepository.save(user);
     }
 
     public AvailabilityResponse validateEmail(String email) {

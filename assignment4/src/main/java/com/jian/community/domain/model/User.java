@@ -27,4 +27,8 @@ public class User extends MinimalEntity {
     public void update(String nickname) {
         this.nickname = nickname;
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }
