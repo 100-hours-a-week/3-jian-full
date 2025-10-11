@@ -19,14 +19,14 @@ public class SessionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createSession(@RequestBody CreateSessionRequest request, HttpServletResponse httpResponse) {
+    public void logIn(@RequestBody CreateSessionRequest request, HttpServletResponse httpResponse) {
         Long userId = userService.authenticate(request.email(), request.password());
         sessionManager.createSession(userId, httpResponse);
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void expireSession(HttpServletRequest httpRequest){
+    public void logOut(HttpServletRequest httpRequest){
         sessionManager.expireSession(httpRequest);
     }
 }

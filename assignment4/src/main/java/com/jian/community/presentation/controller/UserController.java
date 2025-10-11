@@ -19,7 +19,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid @RequestBody CreateUserRequest request) {
+    public void signUp(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
     }
 
