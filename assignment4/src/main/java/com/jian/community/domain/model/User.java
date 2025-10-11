@@ -23,4 +23,8 @@ public class User extends MinimalEntity {
         user.profileImageUrl = profileImageUrl;
         return user;
     }
+
+    public void update(String nickname) {
+        this.nickname = nickname;
+    }
 }

@@ -25,9 +25,16 @@ public class UserController {
 
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public UserInfoResponse getMyInfo(HttpServletRequest request) {
-        Long userId = sessionManager.getSession(request).getUserId();
+    public UserInfoResponse getMyInfo(HttpServletRequest httpRequest) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
         return userService.getUserInfo(userId);
+    }
+
+    @PatchMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public UserInfoResponse updateMyInfo(@Valid @RequestBody UpdateUserRequest request, HttpServletRequest httpRequest) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        return userService.updateUserInfo(userId, request);
     }
 
     @GetMapping("/emails/availability")

@@ -8,6 +8,7 @@ import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
 import com.jian.community.presentation.dto.AvailabilityResponse;
 import com.jian.community.presentation.dto.CreateUserRequest;
+import com.jian.community.presentation.dto.UpdateUserRequest;
 import com.jian.community.presentation.dto.UserInfoResponse;
 import lombok.AllArgsConstructor;
 
@@ -67,6 +68,18 @@ public class UserService {
                         ErrorCode.USER_NOT_EXISTS,
                         "사용자를 찾을 수 없습니다."
                 ));
+
+        return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
+    }
+
+    public UserInfoResponse updateUserInfo(Long userId, UpdateUserRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(
+                        ErrorCode.USER_NOT_EXISTS,
+                        "사용자를 찾을 수 없습니다."
+                ));
+        user.update(request.nickname());
+        userRepository.save(user);
 
         return new UserInfoResponse(user.getEmail(), user.getNickname(), user.getProfileImageUrl());
     }
