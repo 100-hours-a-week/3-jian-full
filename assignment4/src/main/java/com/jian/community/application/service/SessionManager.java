@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 // transactional
@@ -40,17 +42,14 @@ public class SessionManager {
         response.addCookie(cookie);
     }
 
-    public UserSession getSession(HttpServletRequest request) {
-        String sessionId = request.getHeader("JSESSIONID");
-        return userSessionRepository.findBySessionId(sessionId)
+
+
+    public void extendSession(HttpServletRequest request) {
+        UserSession userSession = getSession(request)
                 .orElseThrow(() -> new NotFoundException(
                         ErrorCode.SESSION_NOT_EXISTS,
                         "세션이 만료되었거나 존재하지 않습니다."
                 ));
-    }
-
-    public void extendSession(HttpServletRequest request) {
-        UserSession userSession = getSession(request);
         LocalDateTime now = LocalDateTime.now();
 
         userSession.extendSession(now, SESSION_TTL);
@@ -58,10 +57,18 @@ public class SessionManager {
     }
 
     public void expireSession(HttpServletRequest request) {
-        String sessionId = request.getHeader("JSESSIONID");
+        getSessionId(request)
+                .ifPresent(userSessionRepository::deleteBySessionId);
+    }
 
-        if (userSessionRepository.existsBySessionId(sessionId)) {
-            userSessionRepository.deleteBySessionId(sessionId);
-        }
+    public Optional<UserSession> getSession(HttpServletRequest request) {
+        return getSessionId(request).flatMap(userSessionRepository::findBySessionId);
+    }
+
+    private Optional<String> getSessionId(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "JSESSIONID".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue);
     }
 }
