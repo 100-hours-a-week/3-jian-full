@@ -1,5 +1,6 @@
 package com.jian.community.presentation.controller;
 
+import com.jian.community.application.service.PostLikeService;
 import com.jian.community.application.service.PostService;
 import com.jian.community.application.service.SessionManager;
 import com.jian.community.presentation.dto.*;
@@ -17,13 +18,13 @@ import java.time.LocalDateTime;
 public class PostController {
 
     private final PostService postService;
+    private final PostLikeService postLikeService;
     private final SessionManager sessionManager;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CursorResponse<PostResponse> getPosts(
             @RequestParam(required = false) LocalDateTime cursor
-            // HttpServletRequest httpRequest
     ) {
         return postService.getPosts(cursor);
     }
@@ -32,7 +33,6 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     public PostDetailResponse getPostDetail(
             @PathVariable Long postId
-            // HttpServletRequest httpRequest
     ) {
         return postService.getPostDetail(postId);
     }
@@ -66,5 +66,25 @@ public class PostController {
     ) {
         Long userId = sessionManager.getSession(httpRequest).getUserId();
         postService.deletePost(userId, postId);
+    }
+
+    @PostMapping("/{postId}/likes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createPostLike(
+            @PathVariable Long postId,
+            HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        postLikeService.createPostLike(postId, userId);
+    }
+
+    @DeleteMapping("/{postId}/likes")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePostLike(
+            @PathVariable Long postId,
+            HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        postLikeService.deletePostLike(postId, userId);
     }
 }
