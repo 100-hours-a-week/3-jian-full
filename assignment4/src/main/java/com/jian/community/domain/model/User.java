@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class User extends MinimalEntity {
@@ -16,12 +16,7 @@ public class User extends MinimalEntity {
     private String profileImageUrl;
 
     public static User of(String email, String password, String nickname, String profileImageUrl) {
-        User user = new User();
-        user.email = email;
-        user.password = password;
-        user.nickname = nickname;
-        user.profileImageUrl = profileImageUrl;
-        return user;
+        return new User(email, password, nickname, profileImageUrl);
     }
 
     public void update(String nickname) {

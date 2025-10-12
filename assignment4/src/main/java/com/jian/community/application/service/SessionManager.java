@@ -28,7 +28,7 @@ public class SessionManager {
     public void createSession(Long userId, HttpServletResponse response) {
         String sessionId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
-        UserSession session = new UserSession(
+        UserSession session = UserSession.of(
                 sessionId,
                 userId,
                 now,
