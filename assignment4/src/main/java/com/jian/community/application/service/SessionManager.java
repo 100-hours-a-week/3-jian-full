@@ -60,7 +60,7 @@ public class SessionManager {
                 .flatMap(userSessionRepository::findBySessionId);
 
         return session.orElseThrow(() -> new UnauthorizedException(
-                ErrorCode.SESSION_NOT_EXISTS,
+                ErrorCode.AUTHENTICATION_REQUIRED,
                 "세션이 만료되었거나 존재하지 않습니다."
         ));
     }
