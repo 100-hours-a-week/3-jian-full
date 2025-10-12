@@ -4,9 +4,12 @@ import com.jian.community.infrastructure.util.AtomicLongIdGenerator;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import static com.jian.community.infrastructure.util.InMemoryReflectionHelper.*;
 
@@ -32,6 +35,10 @@ public class InMemoryRepository<T> {
 
         store.put(id, entity);
         return store.get(id);
+    }
+
+    public List<T> findAll() {
+        return store.values().stream().toList();
     }
 
     public Optional<T> findById(Long id) {

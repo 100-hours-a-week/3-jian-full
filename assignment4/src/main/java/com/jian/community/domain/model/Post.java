@@ -12,12 +12,12 @@ import java.util.List;
 @Getter
 public class Post extends MinimalEntity {
 
-    private User writer;
+    private Long userId;
     private String title;
     private String content;
     private List<String> postImageUrls;
 
-    public static Post of(User writer, String title, String content, List<String> postImageUrls) {
-        return new Post(writer, title, content, postImageUrls);
+    public static Post of(Long userId, String title, String content, List<String> postImageUrls) {
+        return new Post(userId, title, content, postImageUrls);
     }
 }
