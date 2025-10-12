@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 @Primary
@@ -25,8 +26,13 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     @Override
     public PostLike save(PostLike postLike) {
         PostLike saved = delegate.save(postLike);
-        postIdIndex.get(saved.getPostId()).add(saved.getId());
-        userIdIndex.get(saved.getUserId()).add(saved.getId());
+        postIdIndex
+                .computeIfAbsent(saved.getPostId(), key -> new CopyOnWriteArrayList<>())
+                .add(saved.getId());
+
+        userIdIndex
+                .computeIfAbsent(saved.getUserId(), key -> new CopyOnWriteArrayList<>())
+                .add(saved.getId());
         return saved;
     }
 
@@ -38,7 +44,7 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     @Override
     public List<PostLike> findByPostId(Long postId) {
         List<Long> postLikeIds = postIdIndex.get(postId);
-        if (postLikeIds.isEmpty()) return Collections.emptyList();
+        if (postLikeIds == null || postLikeIds.isEmpty()) return Collections.emptyList();
 
         return postLikeIds.stream()
                 .map(this::findById)
@@ -53,7 +59,7 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     @Override
     public void deleteByPostIdAndUserId(Long postId, Long userId) {
         List<Long> postLikeIds = postIdIndex.get(postId);
-        if (postLikeIds.isEmpty()) return;
+        if (postLikeIds == null || postLikeIds.isEmpty()) return;
 
         List<PostLike> existingPostLikes = postLikeIds.stream()
                 .map(this::findById)

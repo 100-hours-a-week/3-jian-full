@@ -20,4 +20,10 @@ public class Post extends MinimalEntity {
     public static Post of(Long userId, String title, String content, List<String> postImageUrls) {
         return new Post(userId, title, content, postImageUrls);
     }
+
+    public void update(String title, String content, List<String> postImageUrls) {
+        this.title = title;
+        this.content = content;
+        this.postImageUrls = postImageUrls;
+    }
 }

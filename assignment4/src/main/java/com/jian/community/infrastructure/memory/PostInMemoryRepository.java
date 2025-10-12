@@ -51,6 +51,6 @@ public class PostInMemoryRepository implements PostRepository {
                 .toList();
         boolean hasNext = content.size() > pageSize;
 
-        return new CursorPage<>(content.subList(0, pageSize), hasNext);
+        return new CursorPage<>(content.subList(0, Math.min(content.size(), pageSize)), hasNext);
     }
 }

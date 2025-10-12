@@ -1,10 +1,12 @@
 package com.jian.community.application.service;
 
+import com.jian.community.domain.constant.ErrorCode;
 import com.jian.community.domain.dto.CursorPage;
+import com.jian.community.domain.exception.BadRequestException;
+import com.jian.community.domain.exception.ForbiddenException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.*;
-import com.jian.community.presentation.dto.CursorResponse;
-import com.jian.community.presentation.dto.PostResponse;
+import com.jian.community.presentation.dto.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostService {
 
-    private final int PAGE_SIZE = 10;
+    private final int POST_PAGE_SIZE = 10;
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
@@ -24,7 +26,7 @@ public class PostService {
     private final UserRepository userRepository;
 
     public CursorResponse<PostResponse> getPosts(LocalDateTime cursor) {
-        CursorPage<Post> page = postRepository.findAllOrderByCreatedAtDesc(cursor, PAGE_SIZE);
+        CursorPage<Post> page = postRepository.findAllOrderByCreatedAtDesc(cursor, POST_PAGE_SIZE);
 
         LocalDateTime nextCursor = page.hasNext() ? page.content().getLast().getCreateAt() : null;
         List<PostResponse> items = page.content().stream()
@@ -48,5 +50,93 @@ public class PostService {
                 }).toList();
 
         return new CursorResponse<>(items, nextCursor, page.hasNext());
+    }
+
+    public PostDetailResponse getPostDetail(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new BadRequestException(
+                        ErrorCode.POST_NOT_EXISTS,
+                        "게시글을 찾을 수 없습니다."
+                ));
+        User postWriter = userRepository.findByIdOrThrow(post.getUserId());
+        List<PostLike> likes = postLikeRepository.findByPostId(post.getId());
+        CursorPage<Comment> comments = commentRepository
+                .findAllByPostIdOrderByCreatedAtDesc(post.getId(), null, 10);
+        PostView postView = postViewRepository.findByPostIdOrThrow(post.getId());
+
+        LocalDateTime nextCursor = comments.hasNext() ? comments.content().getLast().getCreateAt() : null;
+        List<CommentResponse> commentsPreviewItems = comments.content().stream()
+                .map(comment -> {
+                    User commentWriter = userRepository.findByIdOrThrow(comment.getUserId());
+                    return new CommentResponse(
+                            commentWriter.getNickname(),
+                            commentWriter.getProfileImageUrl(),
+                            comment.getContent(),
+                            comment.getCreateAt(),
+                            comment.getUpdateAt()
+                    );
+                }).toList();
+        CursorResponse<CommentResponse> commentPreview = new CursorResponse<>(
+                commentsPreviewItems,
+                nextCursor,
+                comments.hasNext()
+        );
+        return new PostDetailResponse(
+                post.getId(),
+                post.getTitle(),
+                postWriter.getNickname(),
+                postWriter.getProfileImageUrl(),
+                likes.size(),
+                comments.content().size(),
+                postView.getCount(),
+                post.getCreateAt(),
+                post.getUpdateAt(),
+                post.getContent(),
+                post.getPostImageUrls(),
+                commentPreview
+        );
+    }
+
+    public PostIdResponse createPost(Long userId, CreatePostRequest request) {
+        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = Post.of(
+                writer.getId(),
+                request.title(),
+                request.content(),
+                request.postImageUrls()
+        );
+        Long postId = postRepository.save(post).getId();
+
+        PostView postView = PostView.from(postId);
+        postViewRepository.save(postView);
+
+        return new PostIdResponse(postId);
+    }
+
+    public void updatePost(Long userId, Long postId, UpdatePostRequest request) {
+        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdOrThrow(postId);
+        if (!post.getUserId().equals(writer.getId())) {
+            throw new ForbiddenException(
+                    ErrorCode.ACCESS_DENIED,
+                    "접근 권한이 없습니다."
+            );
+        }
+
+        post.update(request.title(), request.content(), request.postImageUrls());
+        postRepository.save(post);
+    }
+
+    public void deletePost(Long userId, Long postId) {
+        User writer = userRepository.findByIdOrThrow(userId);
+        Post post = postRepository.findByIdOrThrow(postId);
+        if (!post.getUserId().equals(writer.getId())) {
+            throw new ForbiddenException(
+                    ErrorCode.ACCESS_DENIED,
+                    "접근 권한이 없습니다."
+            );
+        }
+
+        postRepository.deleteById(post.getId());
     }
 }
