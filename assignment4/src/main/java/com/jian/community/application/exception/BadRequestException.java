@@ -1,6 +1,4 @@
-package com.jian.community.domain.exception;
-
-import com.jian.community.domain.constant.ErrorCode;
+package com.jian.community.application.exception;
 
 public class BadRequestException extends RuntimeException {
 

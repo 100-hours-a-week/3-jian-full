@@ -1,7 +1,7 @@
 package com.jian.community.domain.repository;
 
-import com.jian.community.domain.constant.ErrorCode;
-import com.jian.community.domain.exception.NotFoundException;
+import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.PostView;
 
 import java.util.Optional;

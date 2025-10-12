@@ -1,6 +1,5 @@
 package com.jian.community.presentation.validation;
 
-import com.jian.community.domain.constant.ValidationMessage;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Pattern;

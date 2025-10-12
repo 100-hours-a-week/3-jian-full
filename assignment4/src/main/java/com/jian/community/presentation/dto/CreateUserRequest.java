@@ -1,6 +1,6 @@
 package com.jian.community.presentation.dto;
 
-import com.jian.community.domain.constant.ValidationMessage;
+import com.jian.community.presentation.validation.ValidationMessage;
 import com.jian.community.presentation.validation.EmailFormat;
 import com.jian.community.presentation.validation.NicknameFormat;
 import com.jian.community.presentation.validation.PasswordFormat;

@@ -1,8 +1,8 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.util.FileStorage;
-import com.jian.community.domain.constant.ErrorCode;
-import com.jian.community.domain.exception.BadRequestException;
+import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.BadRequestException;
 import com.jian.community.presentation.dto.ImageUrlResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

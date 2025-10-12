@@ -1,9 +1,9 @@
 package com.jian.community.application.service;
 
-import com.jian.community.domain.constant.ErrorCode;
+import com.jian.community.application.exception.ErrorCode;
 import com.jian.community.domain.dto.CursorPage;
-import com.jian.community.domain.exception.ForbiddenException;
-import com.jian.community.domain.exception.NotFoundException;
+import com.jian.community.application.exception.ForbiddenException;
+import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.CommentRepository;
 import com.jian.community.domain.repository.PostRepository;

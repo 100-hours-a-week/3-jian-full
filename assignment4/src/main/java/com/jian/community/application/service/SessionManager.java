@@ -1,7 +1,7 @@
 package com.jian.community.application.service;
 
-import com.jian.community.domain.constant.ErrorCode;
-import com.jian.community.domain.exception.UnauthorizedException;
+import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.UnauthorizedException;
 import com.jian.community.domain.model.UserSession;
 import com.jian.community.domain.repository.UserSessionRepository;
 import jakarta.servlet.http.Cookie;

@@ -1,4 +1,4 @@
-package com.jian.community.domain.constant;
+package com.jian.community.application.exception;
 
 public enum ErrorCode {
 

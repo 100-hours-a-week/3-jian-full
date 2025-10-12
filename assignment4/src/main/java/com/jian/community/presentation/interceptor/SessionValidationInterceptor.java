@@ -1,8 +1,8 @@
 package com.jian.community.presentation.interceptor;
 
 import com.jian.community.application.service.SessionManager;
-import com.jian.community.domain.constant.ErrorCode;
-import com.jian.community.domain.exception.UnauthorizedException;
+import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.UnauthorizedException;
 import com.jian.community.domain.model.UserSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
