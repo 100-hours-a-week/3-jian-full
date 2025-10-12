@@ -1,5 +1,6 @@
 package com.jian.community.presentation.controller;
 
+import com.jian.community.application.service.CommentService;
 import com.jian.community.application.service.PostLikeService;
 import com.jian.community.application.service.PostService;
 import com.jian.community.application.service.SessionManager;
@@ -19,6 +20,7 @@ public class PostController {
 
     private final PostService postService;
     private final PostLikeService postLikeService;
+    private final CommentService commentService;
     private final SessionManager sessionManager;
 
     @GetMapping
@@ -86,5 +88,48 @@ public class PostController {
     ) {
         Long userId = sessionManager.getSession(httpRequest).getUserId();
         postLikeService.deletePostLike(postId, userId);
+    }
+
+    @GetMapping("/{postId}/comments")
+    @ResponseStatus(HttpStatus.OK)
+    public CursorResponse<CommentResponse> getComments(
+            @PathVariable Long postId,
+            @RequestParam(required = false) LocalDateTime cursor
+    ) {
+        return commentService.getComments(postId, cursor);
+    }
+
+    @PostMapping("/{postId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentResponse creatComment(
+            @PathVariable Long postId,
+            @Valid @RequestBody CreateCommentRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        return commentService.creatComment(postId, userId, request);
+    }
+
+    @PutMapping("/{postId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            @Valid @RequestBody UpdateCommentRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        commentService.updateComment(postId, commentId, userId, request);
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(
+            @PathVariable Long postId,
+            @PathVariable Long commentId,
+            HttpServletRequest httpRequest
+    ) {
+        Long userId = sessionManager.getSession(httpRequest).getUserId();
+        commentService.deleteComment(postId, commentId, userId);
     }
 }

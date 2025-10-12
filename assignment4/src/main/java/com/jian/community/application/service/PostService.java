@@ -2,7 +2,6 @@ package com.jian.community.application.service;
 
 import com.jian.community.domain.constant.ErrorCode;
 import com.jian.community.domain.dto.CursorPage;
-import com.jian.community.domain.exception.BadRequestException;
 import com.jian.community.domain.exception.ForbiddenException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.*;
@@ -28,7 +27,7 @@ public class PostService {
     public CursorResponse<PostResponse> getPosts(LocalDateTime cursor) {
         CursorPage<Post> page = postRepository.findAllOrderByCreatedAtDesc(cursor, POST_PAGE_SIZE);
 
-        LocalDateTime nextCursor = page.hasNext() ? page.content().getLast().getCreateAt() : null;
+        LocalDateTime nextCursor = page.hasNext() ? page.content().getLast().getCreatedAt() : null;
         List<PostResponse> items = page.content().stream()
                 .map(post -> {
                     User writer = userRepository.findByIdOrThrow(post.getUserId());
@@ -44,8 +43,8 @@ public class PostService {
                             likes.size(),
                             comments.size(),
                             postView.getCount(),
-                            post.getCreateAt(),
-                            post.getUpdateAt()
+                            post.getCreatedAt(),
+                            post.getUpdatedAt()
                     );
                 }).toList();
 
@@ -53,27 +52,24 @@ public class PostService {
     }
 
     public PostDetailResponse getPostDetail(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BadRequestException(
-                        ErrorCode.POST_NOT_EXISTS,
-                        "게시글을 찾을 수 없습니다."
-                ));
+        Post post = postRepository.findByIdOrThrow(postId);
         User postWriter = userRepository.findByIdOrThrow(post.getUserId());
         List<PostLike> likes = postLikeRepository.findByPostId(post.getId());
         CursorPage<Comment> comments = commentRepository
                 .findAllByPostIdOrderByCreatedAtDesc(post.getId(), null, 10);
         PostView postView = postViewRepository.findByPostIdOrThrow(post.getId());
 
-        LocalDateTime nextCursor = comments.hasNext() ? comments.content().getLast().getCreateAt() : null;
+        LocalDateTime nextCursor = comments.hasNext() ? comments.content().getLast().getCreatedAt() : null;
         List<CommentResponse> commentsPreviewItems = comments.content().stream()
                 .map(comment -> {
                     User commentWriter = userRepository.findByIdOrThrow(comment.getUserId());
                     return new CommentResponse(
+                            comment.getId(),
                             commentWriter.getNickname(),
                             commentWriter.getProfileImageUrl(),
                             comment.getContent(),
-                            comment.getCreateAt(),
-                            comment.getUpdateAt()
+                            comment.getCreatedAt(),
+                            comment.getUpdatedAt()
                     );
                 }).toList();
         CursorResponse<CommentResponse> commentPreview = new CursorResponse<>(
@@ -89,8 +85,8 @@ public class PostService {
                 likes.size(),
                 comments.content().size(),
                 postView.getCount(),
-                post.getCreateAt(),
-                post.getUpdateAt(),
+                post.getCreatedAt(),
+                post.getUpdatedAt(),
                 post.getContent(),
                 post.getPostImageUrls(),
                 commentPreview

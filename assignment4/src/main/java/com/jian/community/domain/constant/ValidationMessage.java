@@ -11,6 +11,7 @@ public class ValidationMessage {
     public static final String PROFILE_IMAGE_URL_REQUIRED = "프로필 이미지 링크는 필수 입력 항목입니다.";
     public static final String POST_TITLE_REQUIRED = "게시글 제목은 필수 입력 항목입니다.";
     public static final String POST_CONTENT_REQUIRED = "게시글 내용은 필수 입력 항목입니다.";
+    public static final String COMMENT_CONTENT_REQUIRED = "댓글 내용은 필수 입력 항목입니다.";
 
     /*
       @Pattern

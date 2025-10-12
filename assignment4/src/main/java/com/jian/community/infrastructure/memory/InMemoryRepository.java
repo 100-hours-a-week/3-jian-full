@@ -26,6 +26,7 @@ public class InMemoryRepository<T> {
             id = idGenerator.nextId();
             setId(entity, id);
             setCreatedAt(entity, now);
+            setUpdatedAt(entity, now);
 
         } else {
             setUpdatedAt(entity, now);

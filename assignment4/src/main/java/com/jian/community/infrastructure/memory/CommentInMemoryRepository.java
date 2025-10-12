@@ -51,8 +51,8 @@ public class CommentInMemoryRepository implements CommentRepository {
     @Override
     public CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize) {
         List<Comment> content = delegate.findAll().stream()
-                .filter(comment -> cursor == null || comment.getCreateAt().isBefore(cursor))
-                .sorted(Comparator.comparing(Comment::getCreateAt).reversed())
+                .filter(comment -> cursor == null || comment.getCreatedAt().isBefore(cursor))
+                .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
                 .limit(pageSize + 1)
                 .toList();
         boolean hasNext = content.size() > pageSize;

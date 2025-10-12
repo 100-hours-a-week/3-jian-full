@@ -22,4 +22,8 @@ public class Comment extends MinimalEntity {
         comment.content = content;
         return comment;
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

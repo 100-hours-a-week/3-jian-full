@@ -45,8 +45,8 @@ public class PostInMemoryRepository implements PostRepository {
     @Override
     public CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize) {
         List<Post> content = delegate.findAll().stream()
-                .filter(post -> cursor == null || post.getCreateAt().isBefore(cursor))
-                .sorted(Comparator.comparing(Post::getCreateAt).reversed())
+                .filter(post -> cursor == null || post.getCreatedAt().isBefore(cursor))
+                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
                 .limit(pageSize + 1)
                 .toList();
         boolean hasNext = content.size() > pageSize;
