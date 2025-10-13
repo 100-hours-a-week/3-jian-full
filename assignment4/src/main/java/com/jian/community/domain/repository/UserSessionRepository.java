@@ -11,6 +11,4 @@ public interface UserSessionRepository {
     Optional<UserSession> findBySessionId(String sessionId);
 
     void deleteBySessionId(String sessionId);
-
-    boolean existsBySessionId(String sessionId);
 }

@@ -11,15 +11,15 @@ import java.util.Optional;
 
 public interface CommentRepository {
 
-    public Comment save(Comment comment);
+    Comment save(Comment comment);
 
-    public Optional<Comment> findById(Long commentId);
+    Optional<Comment> findById(Long commentId);
 
-    public List<Comment> findByPostId(Long postId);
+    List<Comment> findByPostId(Long postId);
 
     CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize);
 
-    public void deleteById(Long commentId);
+    void deleteById(Long commentId);
 
     default Comment findByIdOrThrow(Long commentId) {
         return findById(commentId)

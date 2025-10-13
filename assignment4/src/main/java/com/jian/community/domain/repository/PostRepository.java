@@ -10,13 +10,11 @@ import java.util.Optional;
 
 public interface PostRepository {
 
-    public Post save(Post post);
+    Post save(Post post);
 
     Optional<Post> findById(Long postId);
 
     void deleteById(Long postId);
-
-    boolean existsById(Long postId);
 
     CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize);
 

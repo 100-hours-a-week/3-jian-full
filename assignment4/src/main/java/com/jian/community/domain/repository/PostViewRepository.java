@@ -8,11 +8,9 @@ import java.util.Optional;
 
 public interface PostViewRepository {
 
-    public PostView save(PostView postView);
+    PostView save(PostView postView);
 
-    public Optional<PostView> findByPostId(Long postId);
-
-    public void deleteByPostId(Long postId);
+    Optional<PostView> findByPostId(Long postId);
 
     default PostView findByPostIdOrThrow(Long postId) {
         return findByPostId(postId)
