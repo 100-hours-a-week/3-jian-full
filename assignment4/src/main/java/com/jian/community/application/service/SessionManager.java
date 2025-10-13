@@ -66,7 +66,8 @@ public class SessionManager {
     }
 
     private Optional<String> getSessionId(HttpServletRequest request) {
-        return Arrays.stream(request.getCookies())
+        return Optional.ofNullable(request.getCookies()).stream()
+                .flatMap(Arrays::stream)
                 .filter(cookie -> "JSESSIONID".equals(cookie.getName()))
                 .findFirst()
                 .map(Cookie::getValue);
