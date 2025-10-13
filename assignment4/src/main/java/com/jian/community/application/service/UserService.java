@@ -3,13 +3,14 @@ package com.jian.community.application.service;
 import com.jian.community.application.util.PasswordEncoder;
 import com.jian.community.application.exception.ErrorCode;
 import com.jian.community.application.exception.BadRequestException;
-import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
 import com.jian.community.presentation.dto.*;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -19,20 +20,16 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public Long authenticate(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.USER_NOT_EXISTS,
-                        "사용자를 찾을 수 없습니다."
-                ));
+        Optional<User> user = userRepository.findByEmail(email);
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (user.isEmpty() || !passwordEncoder.matches(password, user.get().getPassword())) {
             throw new BadRequestException(
                     ErrorCode.INVALID_CREDENTIALS,
                     "인증 정보가 올바르지 않습니다."
             );
         }
 
-        return user.getId();
+        return user.get().getId();
     }
 
     public void createUser(CreateUserRequest request) {
