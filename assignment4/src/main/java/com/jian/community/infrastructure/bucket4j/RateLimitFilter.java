@@ -1,0 +1,45 @@
+package com.jian.community.infrastructure.bucket4j;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.presentation.exception.ErrorResponse;
+import io.github.bucket4j.Bucket;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@AllArgsConstructor
+public class RateLimitFilter extends OncePerRequestFilter {
+
+    private final Bucket bucket;
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        if (bucket.tryConsume(1)) {
+            filterChain.doFilter(request, response);
+
+        } else {
+            handleTooManyRequestException(response);
+        }
+    }
+
+    private void handleTooManyRequestException(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+        response.setContentType("application/json;charset=UTF-8");
+
+        ErrorResponse error = new ErrorResponse(
+                ErrorCode.TOO_MANY_REQUESTS,
+                "비정상적으로 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요."
+        );
+        new ObjectMapper().writeValue(response.getWriter(), error);
+    }
+}

@@ -31,6 +31,9 @@ dependencies {
     // Bcrypt password hashing function
     implementation 'at.favre.lib:bcrypt:0.10.2'
 
+    // Bucket4j Java rate-limiting library
+    implementation 'com.bucket4j:bucket4j-core:8.10.1'
+
     compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
