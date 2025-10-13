@@ -1,6 +1,7 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.exception.ForbiddenException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.*;
@@ -38,7 +39,7 @@ public class PostService {
         if (!post.getUserId().equals(writer.getId())) {
             throw new ForbiddenException(
                     ErrorCode.ACCESS_DENIED,
-                    "접근 권한이 없습니다."
+                    ErrorMessage.ACCESS_DENIED
             );
         }
 
@@ -52,7 +53,7 @@ public class PostService {
         if (!post.getUserId().equals(writer.getId())) {
             throw new ForbiddenException(
                     ErrorCode.ACCESS_DENIED,
-                    "접근 권한이 없습니다."
+                    ErrorMessage.ACCESS_DENIED
             );
         }
 

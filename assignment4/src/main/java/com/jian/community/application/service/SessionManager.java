@@ -1,6 +1,7 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.exception.UnauthorizedException;
 import com.jian.community.domain.model.UserSession;
 import com.jian.community.domain.repository.UserSessionRepository;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class SessionManager {
 
+    private static final String SESSION_COOKIE_NAME = "JSESSIONID";
     private static final Duration SESSION_TTL = Duration.ofHours(2);
 
     private final UserSessionRepository userSessionRepository;
@@ -36,7 +38,7 @@ public class SessionManager {
         );
         userSessionRepository.save(session);
 
-        Cookie cookie = new Cookie("JSESSIONID", sessionId);
+        Cookie cookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         httpResponse.addCookie(cookie);
@@ -50,7 +52,7 @@ public class SessionManager {
 
             throw new UnauthorizedException(
                     ErrorCode.AUTHENTICATION_REQUIRED,
-                    "세션이 만료되었거나 존재하지 않습니다."
+                    ErrorMessage.INVALID_SESSION
             );
         }
 
@@ -63,7 +65,7 @@ public class SessionManager {
 
         return session.orElseThrow(() -> new UnauthorizedException(
                 ErrorCode.AUTHENTICATION_REQUIRED,
-                "세션이 만료되었거나 존재하지 않습니다."
+                ErrorMessage.INVALID_SESSION
         ));
     }
 
@@ -86,7 +88,7 @@ public class SessionManager {
     private Optional<String> getSessionId(HttpServletRequest httpRequest) {
         return Optional.ofNullable(httpRequest.getCookies()).stream()
                 .flatMap(Arrays::stream)
-                .filter(cookie -> "JSESSIONID".equals(cookie.getName()))
+                .filter(cookie -> SESSION_COOKIE_NAME.equals(cookie.getName()))
                 .findFirst()
                 .map(Cookie::getValue);
     }

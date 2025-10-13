@@ -1,6 +1,7 @@
 package com.jian.community.domain.repository;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.domain.dto.CursorPage;
 import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.Post;
@@ -22,7 +23,7 @@ public interface PostRepository {
         return findById(postId)
                 .orElseThrow(() -> new NotFoundException(
                         ErrorCode.POST_NOT_EXISTS,
-                        "게시글을 찾을 수 없습니다."
+                        ErrorMessage.POST_NOT_EXISTS
                 ));
     }
 }

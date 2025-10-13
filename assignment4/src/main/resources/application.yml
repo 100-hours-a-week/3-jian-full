@@ -10,3 +10,7 @@ logging:
 security:
   bcrypt:
     cost: 4
+
+app:
+  image:
+    base-url: http://localhost:8080/

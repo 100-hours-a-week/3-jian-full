@@ -15,18 +15,19 @@ import java.util.UUID;
 @Component
 public class DiskFileStorage implements FileStorage {
 
-    private final Path rootDir = Path.of("files");
+    private static final String ROOT_DIR_NAME = "files";
+    private static final Path ROOT_PATH = Path.of(ROOT_DIR_NAME);
 
     public DiskFileStorage() throws IOException {
-        if (!Files.exists(rootDir)) {
-            Files.createDirectories(rootDir);
+        if (!Files.exists(ROOT_PATH)) {
+            Files.createDirectories(ROOT_PATH);
         }
     }
 
     public String save(MultipartFile file, String subDir) {
         try {
             // 디렉토리 생성
-            Path directory = rootDir.resolve(subDir);
+            Path directory = ROOT_PATH.resolve(subDir);
             Files.createDirectories(directory);
 
             // 고유 파일명 생성 (UUID + 원본 확장자)

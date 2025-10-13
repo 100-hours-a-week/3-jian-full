@@ -1,6 +1,7 @@
 package com.jian.community.domain.repository;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.User;
 
@@ -24,7 +25,7 @@ public interface UserRepository {
         return findById(userId)
                 .orElseThrow(() -> new NotFoundException(
                         ErrorCode.USER_NOT_EXISTS,
-                        "사용자를 찾을 수 없습니다."
+                        ErrorMessage.USER_NOT_EXISTS
                 ));
     }
 }

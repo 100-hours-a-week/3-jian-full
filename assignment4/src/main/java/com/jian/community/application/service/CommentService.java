@@ -1,6 +1,7 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.mapper.CommentDtoMapper;
 import com.jian.community.application.mapper.CursorPageMapper;
 import com.jian.community.domain.dto.CursorPage;
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentService {
 
-    private final int COMMENT_PAGE_SIZE = 10;
+    private static final int COMMENT_PAGE_SIZE = 10;
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
@@ -66,13 +67,13 @@ public class CommentService {
         if (!comment.getPostId().equals(post.getId())) {
             throw new NotFoundException(
                     ErrorCode.COMMENT_NOT_EXISTS,
-                    "댓글을 찾을 수 없습니다."
+                    ErrorMessage.COMMENT_NOT_EXISTS
             );
         }
         if (!comment.getUserId().equals(writer.getId())) {
             throw new ForbiddenException(
                     ErrorCode.ACCESS_DENIED,
-                    "접근 권한이 없습니다."
+                    ErrorMessage.ACCESS_DENIED
             );
         }
 
@@ -88,13 +89,13 @@ public class CommentService {
         if (!comment.getPostId().equals(post.getId())) {
             throw new NotFoundException(
                     ErrorCode.COMMENT_NOT_EXISTS,
-                    "댓글을 찾을 수 없습니다."
+                    ErrorMessage.COMMENT_NOT_EXISTS
             );
         }
         if (!comment.getUserId().equals(writer.getId())) {
             throw new ForbiddenException(
                     ErrorCode.ACCESS_DENIED,
-                    "접근 권한이 없습니다."
+                    ErrorMessage.ACCESS_DENIED
             );
         }
 

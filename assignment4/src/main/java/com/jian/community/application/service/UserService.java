@@ -1,5 +1,6 @@
 package com.jian.community.application.service;
 
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.util.PasswordEncoder;
 import com.jian.community.application.exception.ErrorCode;
 import com.jian.community.application.exception.BadRequestException;
@@ -25,7 +26,7 @@ public class UserService {
         if (user.isEmpty() || !passwordEncoder.matches(password, user.get().getPassword())) {
             throw new BadRequestException(
                     ErrorCode.INVALID_CREDENTIALS,
-                    "인증 정보가 올바르지 않습니다."
+                    ErrorMessage.INVALID_CREDENTIALS
             );
         }
 
@@ -36,14 +37,14 @@ public class UserService {
         if (userRepository.existsByEmail((request.email()))) {
             throw new BadRequestException(
                     ErrorCode.USER_ALREADY_EXISTS,
-                    "이미 사용 중인 이메일입니다."
+                    ErrorMessage.EMAIL_ALREADY_EXISTS
             );
         }
 
         if (userRepository.existsByNickname(request.nickname())) {
             throw new BadRequestException(
                     ErrorCode.USER_ALREADY_EXISTS,
-                    "이미 사용 중인 닉네임입니다."
+                    ErrorMessage.NICKNAME_ALREADY_EXISTS
             );
         }
 
@@ -80,7 +81,7 @@ public class UserService {
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
             throw new BadRequestException(
                     ErrorCode.INVALID_CREDENTIALS,
-                    "인증 정보가 올바르지 않습니다."
+                    ErrorMessage.INVALID_CREDENTIALS
             );
         }
 

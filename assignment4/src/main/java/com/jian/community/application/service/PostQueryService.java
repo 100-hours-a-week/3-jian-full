@@ -20,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostQueryService {
 
-    private final int POST_PAGE_SIZE = 10;
+    private static final int POST_PAGE_SIZE = 10;
 
     private final PostRepository postRepository;
     private final PostLikeRepository postLikeRepository;
