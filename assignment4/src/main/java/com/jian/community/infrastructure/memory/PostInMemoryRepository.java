@@ -38,11 +38,6 @@ public class PostInMemoryRepository implements PostRepository {
     }
 
     @Override
-    public boolean existsById(Long postId) {
-        return delegate.existsById(postId);
-    }
-
-    @Override
     public CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize) {
         List<Post> content = delegate.findAll().stream()
                 .filter(post -> cursor == null || post.getCreatedAt().isBefore(cursor))

@@ -35,9 +35,4 @@ public class PostViewInMemoryRepository implements PostViewRepository {
         if (id == null) return Optional.empty();
         return delegate.findById(id);
     }
-
-    @Override
-    public void deleteByPostId(Long postId) {
-        delegate.deleteById(postId);
-    }
 }

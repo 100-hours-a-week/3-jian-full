@@ -43,20 +43,8 @@ public class UserInMemoryRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByNickname(String nickname) {
-        Long id = nicknameIndex.get(nickname);
-        if (id == null) return Optional.empty();
-        return delegate.findById(id);
-    }
-
-    @Override
     public void deleteById(Long userId) {
         delegate.deleteById(userId);
-    }
-
-    @Override
-    public boolean existsById(Long userId) {
-        return delegate.existsById(userId);
     }
 
     @Override
