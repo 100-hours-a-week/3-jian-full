@@ -1,16 +1,12 @@
 package com.jian.community.presentation.interceptor;
 
 import com.jian.community.application.service.SessionManager;
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.UnauthorizedException;
 import com.jian.community.domain.model.UserSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.time.LocalDateTime;
 
 @Component
 @AllArgsConstructor
@@ -35,20 +31,10 @@ public class SessionValidationInterceptor implements HandlerInterceptor {
         }
 
         // 세션 검증
-        UserSession session = sessionManager.getSession(httpRequest);
-        if (LocalDateTime.now().isAfter(session.getExpiresAt())) {
-            sessionManager.expireSession(httpRequest);
-            throw new UnauthorizedException(
-                    ErrorCode.AUTHENTICATION_REQUIRED,
-                    "세션이 만료되었거나 존재하지 않습니다."
-            );
-        }
+        UserSession session = sessionManager.getValidSession(httpRequest);
 
-        // 사용자 정보 주입
+        // 요청에 사용자 정보 주입
         httpRequest.setAttribute("userId", session.getUserId());
-
-        // 세션 연장
-        sessionManager.extendSession(httpRequest);
 
         return true;
     }

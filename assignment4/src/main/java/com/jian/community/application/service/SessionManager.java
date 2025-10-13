@@ -25,7 +25,7 @@ public class SessionManager {
 
     private final UserSessionRepository userSessionRepository;
 
-    public void createSession(Long userId, HttpServletResponse response) {
+    public void createSession(Long userId, HttpServletResponse httpResponse) {
         String sessionId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
         UserSession session = UserSession.of(
@@ -39,24 +39,26 @@ public class SessionManager {
         Cookie cookie = new Cookie("JSESSIONID", sessionId);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        httpResponse.addCookie(cookie);
     }
 
-    public void extendSession(HttpServletRequest request) {
-        UserSession session = getSession(request);
-        LocalDateTime now = LocalDateTime.now();
+    public UserSession getValidSession(HttpServletRequest httpRequest) {
+        UserSession session = getSession(httpRequest);
 
-        session.extendSession(now, SESSION_TTL);
-        userSessionRepository.save(session);
+        if (LocalDateTime.now().isAfter(session.getExpiresAt())) {
+            expireSession(session.getSessionId());
+
+            throw new UnauthorizedException(
+                    ErrorCode.AUTHENTICATION_REQUIRED,
+                    "세션이 만료되었거나 존재하지 않습니다."
+            );
+        }
+
+        return extendSession(session);
     }
 
-    public void expireSession(HttpServletRequest request) {
-        getSessionId(request)
-                .ifPresent(userSessionRepository::deleteBySessionId);
-    }
-
-    public UserSession getSession(HttpServletRequest request) {
-        Optional<UserSession> session = getSessionId(request)
+    public UserSession getSession(HttpServletRequest httpRequest) {
+        Optional<UserSession> session = getSessionId(httpRequest)
                 .flatMap(userSessionRepository::findBySessionId);
 
         return session.orElseThrow(() -> new UnauthorizedException(
@@ -65,8 +67,24 @@ public class SessionManager {
         ));
     }
 
-    private Optional<String> getSessionId(HttpServletRequest request) {
-        return Optional.ofNullable(request.getCookies()).stream()
+    public void expireSession(HttpServletRequest httpRequest) {
+        getSessionId(httpRequest)
+                .ifPresent(this::expireSession);
+    }
+
+    public void expireSession(String sessionId) {
+        userSessionRepository.deleteBySessionId(sessionId);
+    }
+
+    private UserSession extendSession(UserSession session) {
+        LocalDateTime now = LocalDateTime.now();
+
+        session.extendSession(now, SESSION_TTL);
+        return userSessionRepository.save(session);
+    }
+
+    private Optional<String> getSessionId(HttpServletRequest httpRequest) {
+        return Optional.ofNullable(httpRequest.getCookies()).stream()
                 .flatMap(Arrays::stream)
                 .filter(cookie -> "JSESSIONID".equals(cookie.getName()))
                 .findFirst()

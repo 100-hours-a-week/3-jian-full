@@ -15,6 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionValidationInterceptor)
-                .addPathPatterns("/**"); // 전체 API 대상
+                .addPathPatterns("/**") // 전체 API 대상
+                .excludePathPatterns(
+                        "/users/**/availability", // 이메일, 닉네임 중복 검사 API
+                        "/files/profile-images" // 프로필 이미지 업로드 API
+                );
     }
 }
