@@ -58,6 +58,8 @@ public class PostService {
         CursorPage<Comment> comments = commentRepository
                 .findAllByPostIdOrderByCreatedAtDesc(post.getId(), null, 10);
         PostView postView = postViewRepository.findByPostIdOrThrow(post.getId());
+        postView.increase();
+        postViewRepository.save(postView);
 
         LocalDateTime nextCursor = comments.hasNext() ? comments.content().getLast().getCreatedAt() : null;
         List<CommentResponse> commentsPreviewItems = comments.content().stream()
