@@ -44,8 +44,12 @@ public class SessionValidationInterceptor implements HandlerInterceptor {
             );
         }
 
+        // 사용자 정보 주입
+        httpRequest.setAttribute("userId", session.getUserId());
+
         // 세션 연장
         sessionManager.extendSession(httpRequest);
+
         return true;
     }
 }

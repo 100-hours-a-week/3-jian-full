@@ -3,9 +3,7 @@ package com.jian.community.presentation.controller;
 import com.jian.community.application.service.CommentService;
 import com.jian.community.application.service.PostLikeService;
 import com.jian.community.application.service.PostService;
-import com.jian.community.application.service.SessionManager;
 import com.jian.community.presentation.dto.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,6 @@ public class PostController {
     private final PostService postService;
     private final PostLikeService postLikeService;
     private final CommentService commentService;
-    private final SessionManager sessionManager;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -43,9 +40,8 @@ public class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     public PostIdResponse createPost(
             @Valid @RequestBody CreatePostRequest request,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         return postService.createPost(userId, request);
     }
 
@@ -54,9 +50,8 @@ public class PostController {
     public void updatePost(
             @PathVariable Long postId,
             @Valid @RequestBody UpdatePostRequest request,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         postService.updatePost(userId, postId, request);
     }
 
@@ -64,9 +59,8 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(
             @PathVariable Long postId,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         postService.deletePost(userId, postId);
     }
 
@@ -74,9 +68,8 @@ public class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createPostLike(
             @PathVariable Long postId,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         postLikeService.createPostLike(postId, userId);
     }
 
@@ -84,9 +77,8 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePostLike(
             @PathVariable Long postId,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         postLikeService.deletePostLike(postId, userId);
     }
 
@@ -104,9 +96,8 @@ public class PostController {
     public CommentResponse creatComment(
             @PathVariable Long postId,
             @Valid @RequestBody CreateCommentRequest request,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         return commentService.creatComment(postId, userId, request);
     }
 
@@ -116,9 +107,8 @@ public class PostController {
             @PathVariable Long postId,
             @PathVariable Long commentId,
             @Valid @RequestBody UpdateCommentRequest request,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         commentService.updateComment(postId, commentId, userId, request);
     }
 
@@ -127,9 +117,8 @@ public class PostController {
     public void deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            HttpServletRequest httpRequest
+            @RequestAttribute Long userId
     ) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
         commentService.deleteComment(postId, commentId, userId);
     }
 }

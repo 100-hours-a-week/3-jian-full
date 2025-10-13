@@ -1,9 +1,7 @@
 package com.jian.community.presentation.controller;
 
-import com.jian.community.application.service.SessionManager;
 import com.jian.community.application.service.UserService;
 import com.jian.community.presentation.dto.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private UserService userService;
-    private SessionManager sessionManager;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -25,29 +22,31 @@ public class UserController {
 
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public UserInfoResponse getMyInfo(HttpServletRequest httpRequest) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
+    public UserInfoResponse getMyInfo(@RequestAttribute Long userId) {
         return userService.getUserInfo(userId);
     }
 
     @PatchMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public UserInfoResponse updateMyInfo(@Valid @RequestBody UpdateUserRequest request, HttpServletRequest httpRequest) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
+    public UserInfoResponse updateMyInfo(
+            @Valid @RequestBody UpdateUserRequest request,
+            @RequestAttribute Long userId
+    ) {
         return userService.updateUserInfo(userId, request);
     }
 
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMyAccount(HttpServletRequest httpRequest) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
+    public void deleteMyAccount(@RequestAttribute Long userId) {
         userService.deleteUser(userId);
     }
 
     @PutMapping("/me/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changeMyPassword(@Valid @RequestBody ChangePasswordRequest request, HttpServletRequest httpRequest) {
-        Long userId = sessionManager.getSession(httpRequest).getUserId();
+    public void changeMyPassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @RequestAttribute Long userId
+    ) {
         userService.changePassword(userId, request);
     }
 
