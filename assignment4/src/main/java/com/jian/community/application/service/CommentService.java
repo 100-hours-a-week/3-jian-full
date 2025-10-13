@@ -1,6 +1,8 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.mapper.CommentDtoMapper;
+import com.jian.community.application.mapper.CursorPageMapper;
 import com.jian.community.domain.dto.CursorPage;
 import com.jian.community.application.exception.ForbiddenException;
 import com.jian.community.application.exception.NotFoundException;
@@ -16,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -33,22 +34,11 @@ public class CommentService {
         CursorPage<Comment> page = commentRepository
                 .findAllByPostIdOrderByCreatedAtDesc(post.getId(), cursor, COMMENT_PAGE_SIZE);
 
-        LocalDateTime nextCursor = page.hasNext() ? page.content().getLast().getCreatedAt() : null;
-        List<CommentResponse> items = page.content().stream()
-                .map(comment -> {
-                    User writer = userRepository.findByIdOrThrow(comment.getUserId());
+        return CursorPageMapper.toCursorResponse(page, comment -> {
+            User writer = userRepository.findByIdOrThrow(comment.getUserId());
 
-                    return new CommentResponse(
-                            comment.getId(),
-                            writer.getNickname(),
-                            writer.getProfileImageUrl(),
-                            comment.getContent(),
-                            comment.getCreatedAt(),
-                            comment.getUpdatedAt()
-                    );
-                }).toList();
-
-        return new CursorResponse<>(items, nextCursor, page.hasNext());
+            return CommentDtoMapper.toCommentResponse(comment, writer);
+        });
     }
 
     public CommentResponse creatComment(Long postId, Long userId, CreateCommentRequest request) {
