@@ -2,6 +2,7 @@ package com.jian.community.presentation.controller;
 
 import com.jian.community.application.service.CommentService;
 import com.jian.community.application.service.PostLikeService;
+import com.jian.community.application.service.PostQueryService;
 import com.jian.community.application.service.PostService;
 import com.jian.community.presentation.dto.*;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostController {
 
+    private final PostQueryService postQueryService;
     private final PostService postService;
     private final PostLikeService postLikeService;
     private final CommentService commentService;
@@ -25,7 +27,7 @@ public class PostController {
     public CursorResponse<PostResponse> getPosts(
             @RequestParam(required = false) LocalDateTime cursor
     ) {
-        return postService.getPosts(cursor);
+        return postQueryService.getPosts(cursor);
     }
 
     @GetMapping("/{postId}")
@@ -33,7 +35,7 @@ public class PostController {
     public PostDetailResponse getPostDetail(
             @PathVariable Long postId
     ) {
-        return postService.getPostDetail(postId);
+        return postQueryService.getPostDetail(postId);
     }
 
     @PostMapping
