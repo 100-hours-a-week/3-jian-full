@@ -1,6 +1,5 @@
 package com.jian.community.application.service;
 
-import com.jian.community.application.mapper.CommentDtoMapper;
 import com.jian.community.application.mapper.CursorPageMapper;
 import com.jian.community.application.mapper.PostDtoMapper;
 import com.jian.community.domain.dto.CursorPage;
@@ -28,6 +27,7 @@ public class PostQueryService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostViewService postViewService;
+    private final CommentService commentService;
 
     public CursorResponse<PostResponse> getPosts(LocalDateTime cursor) {
         CursorPage<Post> page = postRepository.findAllOrderByCreatedAtDesc(cursor, POST_PAGE_SIZE);
@@ -46,7 +46,7 @@ public class PostQueryService {
         Post post = postRepository.findByIdOrThrow(postId);
         User writer = userRepository.findByIdOrThrow(post.getUserId());
         List<PostLike> likes = postLikeRepository.findByPostId(postId);
-        CursorResponse<CommentResponse> commentPreview = getRecentComments(postId);
+        CursorResponse<CommentResponse> commentPreview = commentService.getRecentComments(postId);
         PostView view = postViewService.increaseAndGet(postId);
 
         return PostDtoMapper.toPostDetailResponse(
@@ -54,16 +54,5 @@ public class PostQueryService {
                 likes.size(), commentPreview.getItems().size(), view.getCount(),
                 commentPreview
         );
-    }
-
-    private CursorResponse<CommentResponse> getRecentComments(Long postId) {
-        CursorPage<Comment> page = commentRepository
-                .findAllByPostIdOrderByCreatedAtDesc(postId, null, 10);
-
-        return CursorPageMapper.toCursorResponse(page, comment -> {
-            User writer = userRepository.findByIdOrThrow(comment.getUserId());
-
-            return CommentDtoMapper.toCommentResponse(comment, writer);
-        });
     }
 }

@@ -42,6 +42,10 @@ public class CommentService {
         });
     }
 
+    public CursorResponse<CommentResponse> getRecentComments(Long postId) {
+        return getComments(postId, null);
+    }
+
     public CommentResponse creatComment(Long postId, Long userId, CreateCommentRequest request) {
         Post post = postRepository.findByIdOrThrow(postId);
         User writer = userRepository.findByIdOrThrow(userId);
