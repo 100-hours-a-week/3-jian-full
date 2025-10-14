@@ -1,5 +1,6 @@
 package com.jian.community.infrastructure.disk;
 
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.util.FileStorage;
 import com.jian.community.application.exception.ErrorCode;
 import com.jian.community.application.exception.FileStorageException;
@@ -42,7 +43,7 @@ public class DiskFileStorage implements FileStorage {
         } catch (IOException e) {
             throw new FileStorageException(
                     ErrorCode.INTERNAL_SERVER_ERROR,
-                    "파일 저장에 실패했습니다."
+                    ErrorMessage.FILE_STORE_FAILED
             );
         }
     }

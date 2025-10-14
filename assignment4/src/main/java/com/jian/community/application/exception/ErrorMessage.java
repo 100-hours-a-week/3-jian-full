@@ -13,4 +13,7 @@ public class ErrorMessage {
     public static final String POST_NOT_EXISTS = "게시글을 찾을 수 없습니다.";
     public static final String POST_VIEW_NOT_EXISTS = "게시글 조회수 정보를 찾을 수 없습니다.";
     public static final String USER_NOT_EXISTS = "사용자를 찾을 수 없습니다.";
+    public static final String TOO_MANY_REQUESTS = "비정상적으로 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.";
+    public static final String FILE_STORE_FAILED = "파일 저장에 실패했습니다.";
+    public static final String INVALID_INPUT = "입력값이 유효하지 않습니다.";
 }

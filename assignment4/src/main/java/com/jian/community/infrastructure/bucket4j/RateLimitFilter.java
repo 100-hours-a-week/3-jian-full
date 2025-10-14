@@ -2,6 +2,7 @@ package com.jian.community.infrastructure.bucket4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jian.community.application.exception.ErrorCode;
+import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.presentation.exception.ErrorResponse;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
@@ -38,7 +39,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         ErrorResponse error = new ErrorResponse(
                 ErrorCode.TOO_MANY_REQUESTS,
-                "비정상적으로 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요."
+                ErrorMessage.TOO_MANY_REQUESTS
         );
         new ObjectMapper().writeValue(response.getWriter(), error);
     }

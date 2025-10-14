@@ -25,13 +25,9 @@ public class GlobalExceptionHandler {
             String globalMessage = e.getBindingResult().getGlobalErrors().stream()
                     .findFirst()
                     .map(ObjectError::getDefaultMessage)
-                    .orElse("입력값이 유효하지 않습니다.");
+                    .orElse(ErrorMessage.INVALID_INPUT);
 
-            return new FieldErrorResponse(
-                    ErrorCode.INVALID_USER_INPUT,
-                    globalMessage,
-                    null
-            );
+            return new FieldErrorResponse(ErrorCode.INVALID_USER_INPUT, globalMessage, null);
         }
 
         String field = fieldError.get().getField();
