@@ -2,15 +2,6 @@ spring:
   application:
     name: community
 
-logging:
-  level:
-    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: DEBUG
-    org.springframework.http.converter: TRACE
-
-security:
-  bcrypt:
-    cost: 4
-
 app:
   image:
     base-url: http://localhost:8080/
