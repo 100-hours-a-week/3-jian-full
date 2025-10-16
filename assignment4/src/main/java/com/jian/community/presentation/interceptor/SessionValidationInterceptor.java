@@ -12,6 +12,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @AllArgsConstructor
 public class SessionValidationInterceptor implements HandlerInterceptor {
 
+    private static final String LOGIN_API_URL = "/sessions";
+    private static final String SIGNUP_API_URL = "/users";
+    private static final String HTTP_METHOD_POST = "POST";
+    private static final String USER_ID_FIELD = "userId";
+
     private final SessionManager sessionManager;
 
     @Override
@@ -24,8 +29,8 @@ public class SessionValidationInterceptor implements HandlerInterceptor {
         String requestURI = httpRequest.getRequestURI();
         String method = httpRequest.getMethod();
 
-        if (requestURI.equals("/sessions") || requestURI.equals("/users")) {
-            if (method.equals("POST")) {
+        if (requestURI.equals(LOGIN_API_URL) || requestURI.equals(SIGNUP_API_URL)) {
+            if (method.equals(HTTP_METHOD_POST)) {
                 return true;
             }
         }
@@ -34,7 +39,7 @@ public class SessionValidationInterceptor implements HandlerInterceptor {
         UserSession session = sessionManager.getValidSession(httpRequest);
 
         // 요청에 사용자 정보 주입
-        httpRequest.setAttribute("userId", session.getUserId());
+        httpRequest.setAttribute(USER_ID_FIELD, session.getUserId());
 
         return true;
     }
