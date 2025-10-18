@@ -10,14 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 @Primary
 public class CommentInMemoryRepository implements CommentRepository {
 
     private final InMemoryRepository<Comment> delegate;
-    private final Map<Long, List<Long>> postIdIndex =  new ConcurrentHashMap<>();
+    private final Map<Long, List<Comment>> postIdIndex =  new ConcurrentHashMap<>();
 
     public CommentInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -26,9 +25,11 @@ public class CommentInMemoryRepository implements CommentRepository {
     @Override
     public Comment save(Comment comment) {
         Comment saved = delegate.save(comment);
-        postIdIndex
-                .computeIfAbsent(saved.getPostId(), key -> new CopyOnWriteArrayList<>())
-                .add(saved.getId());
+        postIdIndex.compute(saved.getPostId(), (k, list) ->
+                Optional.ofNullable(list)
+                        .map(l -> { l.add(saved); return l; })
+                        .orElseGet(() -> new ArrayList<>(List.of(saved)))
+        );
         return saved;
     }
 
@@ -39,18 +40,14 @@ public class CommentInMemoryRepository implements CommentRepository {
 
     @Override
     public List<Comment> findByPostId(Long postId) {
-        List<Long> commentIds = postIdIndex.get(postId);
-        if (commentIds == null || commentIds.isEmpty()) return Collections.emptyList();
-
-        return commentIds.stream()
-                .map(this::findById)
-                .flatMap(Optional::stream)
-                .toList();
+        List<Comment> comments = postIdIndex.get(postId);
+        if (comments == null) return Collections.emptyList();
+        return List.copyOf(comments); // 원본 배열 보호
     }
 
     @Override
     public CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize) {
-        List<Comment> content = delegate.findAll().stream()
+        List<Comment> content = postIdIndex.get(postId).stream()
                 .filter(comment -> cursor == null || comment.getCreatedAt().isBefore(cursor))
                 .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
                 .limit(pageSize + 1)
@@ -62,6 +59,20 @@ public class CommentInMemoryRepository implements CommentRepository {
 
     @Override
     public void deleteById(Long commentId) {
+        removeIndices(commentId);
         delegate.deleteById(commentId);
+    }
+
+    private void removeIndices(Long commentId) {
+        Optional<Comment> target = findById(commentId);
+        if (target.isEmpty()) return;
+
+        postIdIndex.computeIfPresent(
+                target.get().getPostId(),
+                (key, list) -> {
+                    list.remove(target.get());
+                    return list;
+                }
+        );
     }
 }

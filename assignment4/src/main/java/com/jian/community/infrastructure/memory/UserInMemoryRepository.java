@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserInMemoryRepository implements UserRepository {
 
     private final InMemoryRepository<User> delegate;
-    private final Map<String, Long> emailIndex  = new ConcurrentHashMap<>();
-    private final Map<String, Long> nicknameIndex = new ConcurrentHashMap<>();
+    private final Map<String, User> emailIndex  = new ConcurrentHashMap<>();
+    private final Map<String, User> nicknameIndex = new ConcurrentHashMap<>();
 
     public UserInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -25,8 +25,8 @@ public class UserInMemoryRepository implements UserRepository {
     @Override
     public User save(User user) {
         User saved = delegate.save(user);
-        emailIndex.put(saved.getEmail(), saved.getId());
-        nicknameIndex.put(saved.getNickname(), saved.getId());
+        emailIndex.put(saved.getEmail(), saved);
+        nicknameIndex.put(saved.getNickname(), saved);
         return saved;
     }
 
@@ -37,9 +37,8 @@ public class UserInMemoryRepository implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        Long id = emailIndex.get(email);
-        if (id == null) return Optional.empty();
-        return delegate.findById(id);
+        User user = emailIndex.get(email);
+        return Optional.ofNullable(user);
     }
 
     @Override
@@ -49,15 +48,13 @@ public class UserInMemoryRepository implements UserRepository {
 
     @Override
     public boolean existsByEmail(String email) {
-        Long id = emailIndex.get(email);
-        if (id == null) return false;
-        return delegate.existsById(id);
+        User user = emailIndex.get(email);
+        return user != null;
     }
 
     @Override
     public boolean existsByNickname(String nickname) {
-        Long id = nicknameIndex.get(nickname);
-        if (id == null) return false;
-        return delegate.existsById(id);
+        User user = nicknameIndex.get(nickname);
+        return user != null;
     }
 }

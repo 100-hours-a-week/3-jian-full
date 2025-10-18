@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PostViewInMemoryRepository implements PostViewRepository {
 
     private final InMemoryRepository<PostView> delegate;
-    private final Map<Long, Long> postIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, PostView> postIdIndex = new ConcurrentHashMap<>();
 
 
     public PostViewInMemoryRepository(AtomicLongIdGenerator idGenerator) {
@@ -25,14 +25,13 @@ public class PostViewInMemoryRepository implements PostViewRepository {
     @Override
     public PostView save(PostView postView) {
         PostView saved = delegate.save(postView);
-        postIdIndex.put(saved.getPostId(), saved.getId());
+        postIdIndex.put(saved.getPostId(), saved);
         return saved;
     }
 
     @Override
     public Optional<PostView> findByPostId(Long postId) {
-        Long id = postIdIndex.get(postId);
-        if (id == null) return Optional.empty();
-        return delegate.findById(id);
+        PostView postView = postIdIndex.get(postId);
+        return Optional.ofNullable(postView);
     }
 }

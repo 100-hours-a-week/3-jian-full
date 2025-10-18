@@ -1,6 +1,5 @@
 package com.jian.community.infrastructure.memory;
 
-import com.jian.community.domain.model.MinimalEntity;
 import com.jian.community.domain.model.PostLike;
 import com.jian.community.domain.repository.PostLikeRepository;
 import com.jian.community.infrastructure.util.AtomicLongIdGenerator;
@@ -9,15 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 @Primary
 public class PostLikeInMemoryRepository implements PostLikeRepository {
 
     private final InMemoryRepository<PostLike> delegate;
-    private final Map<Long, List<Long>> postIdIndex = new ConcurrentHashMap<>();
-    private final Map<Long, List<Long>> userIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, List<PostLike>> postIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, List<PostLike>> userIdIndex = new ConcurrentHashMap<>();
+    private final Map<PostUserKey, PostLike> postIdUserIdIndex = new ConcurrentHashMap<>();
 
     public PostLikeInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -26,13 +25,17 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     @Override
     public PostLike save(PostLike postLike) {
         PostLike saved = delegate.save(postLike);
-        postIdIndex
-                .computeIfAbsent(saved.getPostId(), key -> new CopyOnWriteArrayList<>())
-                .add(saved.getId());
-
-        userIdIndex
-                .computeIfAbsent(saved.getUserId(), key -> new CopyOnWriteArrayList<>())
-                .add(saved.getId());
+        postIdIndex.compute(saved.getPostId(), (k, list) ->
+                Optional.ofNullable(list)
+                        .map(l -> { l.add(saved); return l; })
+                        .orElseGet(() -> new ArrayList<>(List.of(saved)))
+        );
+        userIdIndex.compute(saved.getUserId(), (k, list) ->
+                Optional.ofNullable(list)
+                        .map(l -> { l.add(saved); return l; })
+                        .orElseGet(() -> new ArrayList<>(List.of(saved)))
+        );
+        postIdUserIdIndex.put(new PostUserKey(saved.getPostId(), saved.getUserId()), postLike);
         return saved;
     }
 
@@ -43,32 +46,44 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
 
     @Override
     public List<PostLike> findByPostId(Long postId) {
-        List<Long> postLikeIds = postIdIndex.get(postId);
-        if (postLikeIds == null || postLikeIds.isEmpty()) return Collections.emptyList();
-
-        return postLikeIds.stream()
-                .map(this::findById)
-                .flatMap(Optional::stream)
-                .toList();
+        List<PostLike> postLikes = postIdIndex.get(postId);
+        if (postLikes == null) return Collections.emptyList();
+        return List.copyOf(postLikes); // 배열 원본 보호
     }
 
     public void deleteById(Long postLikeId) {
+        removeIndices(postLikeId);
         delegate.deleteById(postLikeId);
     }
 
     @Override
     public void deleteByPostIdAndUserId(Long postId, Long userId) {
-        List<Long> postLikeIds = postIdIndex.get(postId);
-        if (postLikeIds == null || postLikeIds.isEmpty()) return;
+        PostLike target = postIdUserIdIndex.get(new PostUserKey(postId, userId));
+        if (target == null) return;
+        deleteById(target.getId());
+    }
 
-        List<PostLike> existingPostLikes = postLikeIds.stream()
-                .map(this::findById)
-                .flatMap(Optional::stream)
-                .toList();
+    private void removeIndices(Long postLikeId) {
+        Optional<PostLike> target = findById(postLikeId);
+        if (target.isEmpty()) return;
 
-        existingPostLikes.stream()
-                .filter(postLike -> postLike.getUserId().equals(userId))
-                .map(MinimalEntity::getId)
-                .forEach(this::deleteById);
+        postIdIndex.computeIfPresent(
+                target.get().getPostId(),
+                (key, list) -> {
+                    list.remove(target.get());
+                    return list;
+                }
+        );
+        userIdIndex.computeIfPresent(
+                target.get().getUserId(),
+                (key, list) -> {
+                    list.remove(target.get());
+                    return list;
+                }
+        );
+        postIdUserIdIndex.remove(new PostUserKey(target.get().getPostId(), target.get().getUserId()));
+    }
+
+    private record PostUserKey(Long postId, Long userId) {
     }
 }
