@@ -8,15 +8,17 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 @Repository
 @Primary
 public class PostInMemoryRepository implements PostRepository {
 
     private final InMemoryRepository<Post> delegate;
+    private final ConcurrentSkipListMap<LocalDateTime, Post> createdAtIndex = new ConcurrentSkipListMap<>();
 
     PostInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -24,7 +26,9 @@ public class PostInMemoryRepository implements PostRepository {
 
     @Override
     public Post save(Post post) {
-        return delegate.save(post);
+        Post saved = delegate.save(post);
+        createdAtIndex.put(saved.getCreatedAt(), saved);
+        return saved;
     }
 
     @Override
@@ -34,18 +38,28 @@ public class PostInMemoryRepository implements PostRepository {
 
     @Override
     public void deleteById(Long postId) {
+        removeIndices(postId);
         delegate.deleteById(postId);
     }
 
     @Override
     public CursorPage<Post> findAllOrderByCreatedAtDesc(LocalDateTime cursor, int pageSize) {
-        List<Post> content = delegate.findAll().stream()
-                .filter(post -> cursor == null || post.getCreatedAt().isBefore(cursor))
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
+        NavigableMap<LocalDateTime, Post> window = (cursor == null)
+                ? createdAtIndex.descendingMap()
+                : createdAtIndex.headMap(cursor, false).descendingMap();
+
+        List<Post> paged = window.values().stream()
                 .limit(pageSize + 1)
                 .toList();
-        boolean hasNext = content.size() > pageSize;
 
-        return new CursorPage<>(content.subList(0, Math.min(content.size(), pageSize)), hasNext);
+        boolean hasNext = paged.size() > pageSize;
+
+        return new CursorPage<>(paged.subList(0, Math.min(paged.size(), pageSize)), hasNext);
+    }
+
+    private void removeIndices(Long postId) {
+        Optional<Post> target = findById(postId);
+        if (target.isEmpty()) return;
+        createdAtIndex.remove(target.get().getCreatedAt());
     }
 }
