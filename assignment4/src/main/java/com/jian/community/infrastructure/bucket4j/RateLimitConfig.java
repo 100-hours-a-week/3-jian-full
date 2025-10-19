@@ -13,7 +13,7 @@ public class RateLimitConfig {
     @Bean
     Bucket bucket() {
         Bandwidth bandwidth = Bandwidth.builder()
-                .capacity(10) // 버킷 최대 용량
+                .capacity(20) // 버킷 최대 용량
                 .refillIntervally(10, Duration.ofMinutes(1)) // 1분마다 10개의 토큰 리필
                 .build();
 

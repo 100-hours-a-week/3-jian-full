@@ -22,6 +22,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(sessionValidationInterceptor)
                 .addPathPatterns("/**") // 전체 API 대상
                 .excludePathPatterns(
+                        "/v3/api-docs/**", // Spring Doc
+                        "/swagger-ui/**", // Swagger UI
                         "/users/**/availability", // 이메일, 닉네임 중복 검사 API
                         "/files/profile-images" // 프로필 이미지 업로드 API
                 );
