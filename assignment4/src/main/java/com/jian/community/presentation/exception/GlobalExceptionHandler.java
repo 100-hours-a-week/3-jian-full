@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleUnexpectedException() {
         return new ErrorResponse(
                 ErrorCode.INTERNAL_SERVER_ERROR,
-                "서버에서 에러가 발생했습니다."
+                ErrorMessage.INTERNAL_SERVER_ERROR
         );
     }
 }

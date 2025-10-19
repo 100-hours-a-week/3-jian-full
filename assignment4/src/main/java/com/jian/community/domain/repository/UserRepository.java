@@ -24,7 +24,7 @@ public interface UserRepository {
     default User findByIdOrThrow(Long userId) {
         return findById(userId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.USER_NOT_EXISTS,
+                        ErrorCode.RESOURCE_NOT_FOUND,
                         ErrorMessage.USER_NOT_EXISTS
                 ));
     }

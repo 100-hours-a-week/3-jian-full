@@ -25,7 +25,7 @@ public interface CommentRepository {
     default Comment findByIdOrThrow(Long commentId) {
         return findById(commentId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.COMMENT_NOT_EXISTS,
+                        ErrorCode.RESOURCE_NOT_FOUND,
                         ErrorMessage.COMMENT_NOT_EXISTS
                 ));
     }

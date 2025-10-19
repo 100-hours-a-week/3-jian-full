@@ -70,7 +70,7 @@ public class CommentService {
 
         if (!comment.getPostId().equals(post.getId())) {
             throw new NotFoundException(
-                    ErrorCode.COMMENT_NOT_EXISTS,
+                    ErrorCode.RESOURCE_NOT_FOUND,
                     ErrorMessage.COMMENT_NOT_EXISTS
             );
         }
@@ -92,7 +92,7 @@ public class CommentService {
 
         if (!comment.getPostId().equals(post.getId())) {
             throw new NotFoundException(
-                    ErrorCode.COMMENT_NOT_EXISTS,
+                    ErrorCode.RESOURCE_NOT_FOUND,
                     ErrorMessage.COMMENT_NOT_EXISTS
             );
         }

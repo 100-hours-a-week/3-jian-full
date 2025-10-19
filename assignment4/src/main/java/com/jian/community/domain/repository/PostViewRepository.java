@@ -18,7 +18,7 @@ public interface PostViewRepository {
     default PostView findByPostIdOrThrow(Long postId) {
         return findByPostId(postId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.POST_VIEW_NOT_EXISTS,
+                        ErrorCode.RESOURCE_NOT_FOUND,
                         ErrorMessage.POST_VIEW_NOT_EXISTS
                 ));
     }

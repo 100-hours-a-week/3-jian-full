@@ -23,10 +23,7 @@ public enum ErrorCode {
     /*
       404 Not Found
      */
-    USER_NOT_EXISTS,
-    POST_NOT_EXISTS,
-    COMMENT_NOT_EXISTS,
-    POST_VIEW_NOT_EXISTS,
+    RESOURCE_NOT_FOUND,
 
     /*
       409 Conflict

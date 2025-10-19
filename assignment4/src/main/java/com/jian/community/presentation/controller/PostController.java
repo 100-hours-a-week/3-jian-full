@@ -1,10 +1,11 @@
 package com.jian.community.presentation.controller;
 
-import com.jian.community.application.service.CommentService;
 import com.jian.community.application.service.PostLikeService;
 import com.jian.community.application.service.PostQueryService;
 import com.jian.community.application.service.PostService;
 import com.jian.community.presentation.dto.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+@Tag(name = "Post", description = "게시글 관련 API")
 @RestController
 @RequestMapping("/posts")
 @AllArgsConstructor
@@ -20,8 +22,12 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostService postService;
     private final PostLikeService postLikeService;
-    private final CommentService commentService;
 
+    @Operation(
+            summary = "게시글 목록 조회",
+            description = "커서 기반 페이징 방식으로 게시글을 최대 10개씩 조회합니다. "
+                    + "cursor를 입력하지 않으면 첫 페이지를 반환합니다."
+    )
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CursorResponse<PostResponse> getPosts(
@@ -30,6 +36,10 @@ public class PostController {
         return postQueryService.getPosts(cursor);
     }
 
+    @Operation(
+            summary = "게시글 상세 조회",
+            description = "게시글 상세 정보와 댓글 목록의 첫 페이지(최대 10개)가 함께 반환됩니다."
+    )
     @GetMapping("/{postId}")
     @ResponseStatus(HttpStatus.OK)
     public PostDetailResponse getPostDetail(
@@ -38,6 +48,7 @@ public class PostController {
         return postQueryService.getPostDetail(postId);
     }
 
+    @Operation(summary = "게시글 생성")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PostIdResponse createPost(
@@ -47,6 +58,7 @@ public class PostController {
         return postService.createPost(userId, request);
     }
 
+    @Operation(summary = "게시글 수정")
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePost(
@@ -57,6 +69,7 @@ public class PostController {
         postService.updatePost(userId, postId, request);
     }
 
+    @Operation(summary = "게시글 삭제")
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(
@@ -66,6 +79,7 @@ public class PostController {
         postService.deletePost(userId, postId);
     }
 
+    @Operation(summary = "게시글 좋아요")
     @PostMapping("/{postId}/likes")
     @ResponseStatus(HttpStatus.CREATED)
     public void createPostLike(
@@ -75,6 +89,7 @@ public class PostController {
         postLikeService.createPostLike(postId, userId);
     }
 
+    @Operation(summary = "게시글 좋아요 취소")
     @DeleteMapping("/{postId}/likes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePostLike(
@@ -82,45 +97,5 @@ public class PostController {
             @RequestAttribute Long userId
     ) {
         postLikeService.deletePostLike(postId, userId);
-    }
-
-    @GetMapping("/{postId}/comments")
-    @ResponseStatus(HttpStatus.OK)
-    public CursorResponse<CommentResponse> getComments(
-            @PathVariable Long postId,
-            @RequestParam(required = false) LocalDateTime cursor
-    ) {
-        return commentService.getComments(postId, cursor);
-    }
-
-    @PostMapping("/{postId}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CommentResponse creatComment(
-            @PathVariable Long postId,
-            @Valid @RequestBody CreateCommentRequest request,
-            @RequestAttribute Long userId
-    ) {
-        return commentService.creatComment(postId, userId, request);
-    }
-
-    @PutMapping("/{postId}/comments/{commentId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateComment(
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @Valid @RequestBody UpdateCommentRequest request,
-            @RequestAttribute Long userId
-    ) {
-        commentService.updateComment(postId, commentId, userId, request);
-    }
-
-    @DeleteMapping("/{postId}/comments/{commentId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteComment(
-            @PathVariable Long postId,
-            @PathVariable Long commentId,
-            @RequestAttribute Long userId
-    ) {
-        commentService.deleteComment(postId, commentId, userId);
     }
 }

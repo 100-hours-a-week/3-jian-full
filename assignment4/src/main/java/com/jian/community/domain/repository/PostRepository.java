@@ -22,7 +22,7 @@ public interface PostRepository {
     default Post findByIdOrThrow(Long postId) {
         return findById(postId)
                 .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.POST_NOT_EXISTS,
+                        ErrorCode.RESOURCE_NOT_FOUND,
                         ErrorMessage.POST_NOT_EXISTS
                 ));
     }

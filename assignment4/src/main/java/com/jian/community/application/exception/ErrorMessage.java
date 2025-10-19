@@ -16,4 +16,5 @@ public class ErrorMessage {
     public static final String TOO_MANY_REQUESTS = "비정상적으로 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.";
     public static final String FILE_STORE_FAILED = "파일 저장에 실패했습니다.";
     public static final String INVALID_INPUT = "입력값이 유효하지 않습니다.";
+    public static final String INTERNAL_SERVER_ERROR = "서버에서 에러가 발생했습니다.";
 }
