@@ -17,7 +17,8 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class CommentInMemoryRepository implements CommentRepository {
 
     private final InMemoryRepository<Comment> delegate;
-    private final Map<Long, ConcurrentSkipListMap<LocalDateTime, Comment>> postIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, ConcurrentSkipListMap<CommentCreatedAtKey, Comment>> postIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, Object> locks = new ConcurrentHashMap<>();
 
     public CommentInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -25,10 +26,13 @@ public class CommentInMemoryRepository implements CommentRepository {
 
     @Override
     public Comment save(Comment comment) {
+        if (comment.getId() != null) {
+            return delegate.save(comment);
+        }
         Comment saved = delegate.save(comment);
         postIdIndex
                 .computeIfAbsent(saved.getPostId(), k -> new ConcurrentSkipListMap<>())
-                .putIfAbsent(saved.getCreatedAt(), saved);
+                .putIfAbsent(new CommentCreatedAtKey(saved.getId(), saved.getCreatedAt()), saved);
         return saved;
     }
 
@@ -39,19 +43,19 @@ public class CommentInMemoryRepository implements CommentRepository {
 
     @Override
     public List<Comment> findByPostId(Long postId) {
-        ConcurrentSkipListMap<LocalDateTime, Comment> createdAtIndex = postIdIndex.get(postId);
+        ConcurrentSkipListMap<CommentCreatedAtKey, Comment> createdAtIndex = postIdIndex.get(postId);
         if (createdAtIndex == null) return Collections.emptyList();
         return List.copyOf(createdAtIndex.values()); // 원본 배열 보호
     }
 
     @Override
     public CursorPage<Comment> findAllByPostIdOrderByCreatedAtDesc(Long postId, LocalDateTime cursor, int pageSize) {
-        ConcurrentSkipListMap<LocalDateTime, Comment> createdAtIndex =
+        ConcurrentSkipListMap<CommentCreatedAtKey, Comment> createdAtIndex =
                 postIdIndex.getOrDefault(postId, new ConcurrentSkipListMap<>());
 
-        NavigableMap<LocalDateTime, Comment> window = (cursor == null)
+        NavigableMap<CommentCreatedAtKey, Comment> window = (cursor == null)
                         ? createdAtIndex.descendingMap()
-                        : createdAtIndex.headMap(cursor, false).descendingMap();
+                        : createdAtIndex.headMap(new CommentCreatedAtKey(null, cursor), false).descendingMap();
 
         List<Comment> paged = window.values().stream()
                 .limit(pageSize + 1)
@@ -64,19 +68,34 @@ public class CommentInMemoryRepository implements CommentRepository {
 
     @Override
     public void deleteById(Long commentId) {
-        removeIndices(commentId);
-        delegate.deleteById(commentId);
+        Object lock = lockFor(commentId);
+        synchronized (lock) {
+            removeIndices(commentId);
+            delegate.deleteById(commentId);
+        }
     }
 
     private void removeIndices(Long commentId) {
-        Optional<Comment> target = findById(commentId);
-        if (target.isEmpty()) return;
+        Comment target = findById(commentId).orElse(null);
+        if (target == null) return;
 
         postIdIndex.computeIfPresent(
-                target.get().getPostId(),
+                target.getPostId(),
                 (k, idx) -> {
-                    idx.remove(target.get().getCreatedAt());
+                    idx.remove(new CommentCreatedAtKey(target.getId(), target.getCreatedAt()));
                     return idx;
                 });
+    }
+
+    private Object lockFor(Long commentId) {
+        return locks.computeIfAbsent(commentId, k -> new Object());
+    }
+
+    private record CommentCreatedAtKey(Long commentId, LocalDateTime createdAt) implements Comparable<CommentCreatedAtKey> {
+        @Override
+        public int compareTo(CommentCreatedAtKey o) {
+            int cmp = createdAt.compareTo(o.createdAt);
+            return (cmp == 0) ? commentId.compareTo(o.commentId) : cmp;
+        }
     }
 }

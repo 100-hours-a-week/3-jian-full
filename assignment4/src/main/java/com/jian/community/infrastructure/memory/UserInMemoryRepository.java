@@ -17,6 +17,7 @@ public class UserInMemoryRepository implements UserRepository {
     private final InMemoryRepository<User> delegate;
     private final Map<String, User> emailIndex  = new ConcurrentHashMap<>();
     private final Map<String, User> nicknameIndex = new ConcurrentHashMap<>();
+    private final Map<Long, Object> locks =  new ConcurrentHashMap<>();
 
     public UserInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -24,10 +25,17 @@ public class UserInMemoryRepository implements UserRepository {
 
     @Override
     public User save(User user) {
+        if (user.getId() != null) {
+            return delegate.save(user);
+        }
         User saved = delegate.save(user);
-        emailIndex.put(saved.getEmail(), saved);
-        nicknameIndex.put(saved.getNickname(), saved);
-        return saved;
+
+        Object lock = lockFor(saved.getId());
+        synchronized (lock) {
+            emailIndex.put(saved.getEmail(), saved);
+            nicknameIndex.put(saved.getNickname(), saved);
+            return saved;
+        }
     }
 
     @Override
@@ -43,7 +51,11 @@ public class UserInMemoryRepository implements UserRepository {
 
     @Override
     public void deleteById(Long userId) {
-        delegate.deleteById(userId);
+        Object lock = lockFor(userId);
+        synchronized (lock) {
+            removeIndices(userId);
+            delegate.deleteById(userId);
+        }
     }
 
     @Override
@@ -56,5 +68,16 @@ public class UserInMemoryRepository implements UserRepository {
     public boolean existsByNickname(String nickname) {
         User user = nicknameIndex.get(nickname);
         return user != null;
+    }
+
+    private void removeIndices(Long userId) {
+        User target = delegate.findById(userId).orElse(null);
+        if (target == null) return;
+        emailIndex.remove(target.getEmail());
+        nicknameIndex.remove(target.getNickname());
+    }
+
+    private Object lockFor(Long userId) {
+        return locks.computeIfAbsent(userId, k -> new Object());
     }
 }

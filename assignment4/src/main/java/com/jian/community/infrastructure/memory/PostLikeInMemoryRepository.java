@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 @Primary
@@ -17,6 +18,7 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     private final Map<Long, List<PostLike>> postIdIndex = new ConcurrentHashMap<>();
     private final Map<Long, List<PostLike>> userIdIndex = new ConcurrentHashMap<>();
     private final Map<PostUserKey, PostLike> postIdUserIdIndex = new ConcurrentHashMap<>();
+    private final Map<Long, Object> locks = new ConcurrentHashMap<>();
 
     public PostLikeInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -24,19 +26,22 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
 
     @Override
     public PostLike save(PostLike postLike) {
+        if (postLike.getId() != null) {
+            return delegate.save(postLike);
+        }
         PostLike saved = delegate.save(postLike);
-        postIdIndex.compute(saved.getPostId(), (k, list) ->
-                Optional.ofNullable(list)
-                        .map(l -> { l.add(saved); return l; })
-                        .orElseGet(() -> new ArrayList<>(List.of(saved)))
-        );
-        userIdIndex.compute(saved.getUserId(), (k, list) ->
-                Optional.ofNullable(list)
-                        .map(l -> { l.add(saved); return l; })
-                        .orElseGet(() -> new ArrayList<>(List.of(saved)))
-        );
-        postIdUserIdIndex.put(new PostUserKey(saved.getPostId(), saved.getUserId()), postLike);
-        return saved;
+
+        Object lock = lockFor(saved.getId());
+        synchronized (lock) {
+            postIdIndex
+                    .computeIfAbsent(saved.getPostId(), k -> new CopyOnWriteArrayList<>())
+                    .add(saved);
+            userIdIndex
+                    .computeIfAbsent(saved.getUserId(), k -> new CopyOnWriteArrayList<>())
+                    .add(saved);
+            postIdUserIdIndex.put(new PostUserKey(saved.getPostId(), saved.getUserId()), saved);
+            return saved;
+        }
     }
 
     @Override
@@ -52,8 +57,11 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     }
 
     public void deleteById(Long postLikeId) {
-        removeIndices(postLikeId);
-        delegate.deleteById(postLikeId);
+        Object lock = lockFor(postLikeId);
+        synchronized (lock) {
+            removeIndices(postLikeId);
+            delegate.deleteById(postLikeId);
+        }
     }
 
     @Override
@@ -64,24 +72,28 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
     }
 
     private void removeIndices(Long postLikeId) {
-        Optional<PostLike> target = findById(postLikeId);
-        if (target.isEmpty()) return;
+        PostLike target = findById(postLikeId).orElse(null);
+        if (target == null) return;
 
         postIdIndex.computeIfPresent(
-                target.get().getPostId(),
+                target.getPostId(),
                 (key, list) -> {
-                    list.remove(target.get());
+                    list.remove(target);
                     return list;
                 }
         );
         userIdIndex.computeIfPresent(
-                target.get().getUserId(),
+                target.getUserId(),
                 (key, list) -> {
-                    list.remove(target.get());
+                    list.remove(target);
                     return list;
                 }
         );
-        postIdUserIdIndex.remove(new PostUserKey(target.get().getPostId(), target.get().getUserId()));
+        postIdUserIdIndex.remove(new PostUserKey(target.getPostId(), target.getUserId()));
+    }
+
+    private Object lockFor(Long postLikeId) {
+        return locks.computeIfAbsent(postLikeId, k -> new Object());
     }
 
     private record PostUserKey(Long postId, Long userId) {

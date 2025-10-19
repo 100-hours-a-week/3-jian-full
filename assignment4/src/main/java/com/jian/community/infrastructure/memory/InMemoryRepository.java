@@ -17,6 +17,7 @@ public class InMemoryRepository<T> {
     private final AtomicLongIdGenerator idGenerator;
 
     private final Map<Long, T> store = new ConcurrentHashMap<>();
+    private final Map<Long, Object> locks = new ConcurrentHashMap<>();
 
     public T save(T entity) {
         LocalDateTime now = LocalDateTime.now();
@@ -32,8 +33,11 @@ public class InMemoryRepository<T> {
             setUpdatedAt(entity, now);
         }
 
-        store.put(id, entity);
-        return store.get(id);
+        Object lock = lockFor(id);
+        synchronized (lock) {
+            store.put(id, entity);
+            return store.get(id);
+        }
     }
 
     public List<T> findAll() {
@@ -50,5 +54,9 @@ public class InMemoryRepository<T> {
 
     public boolean existsById(Long id) {
         return store.containsKey(id);
+    }
+
+    private Object lockFor(Long id) {
+        return locks.computeIfAbsent(id, k -> new Object());
     }
 }

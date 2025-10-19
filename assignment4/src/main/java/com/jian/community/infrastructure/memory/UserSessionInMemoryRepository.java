@@ -16,6 +16,7 @@ public class UserSessionInMemoryRepository implements UserSessionRepository {
 
     private final InMemoryRepository<UserSession> delegate;
     private final Map<String, UserSession> sessionIdIndex = new ConcurrentHashMap<>();
+    private final Map<String, Object> locks  = new ConcurrentHashMap<>();
 
     public UserSessionInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -36,6 +37,15 @@ public class UserSessionInMemoryRepository implements UserSessionRepository {
     public void deleteBySessionId(String sessionId) {
         UserSession userSession = sessionIdIndex.get(sessionId);
         if (userSession == null) return;
-        delegate.deleteById(userSession.getId());
+
+        Object lock = lockFor(sessionId);
+        synchronized (lock) {
+            sessionIdIndex.remove(sessionId);
+            delegate.deleteById(userSession.getId());
+        }
+    }
+
+    private Object lockFor(String sessionId) {
+        return locks.computeIfAbsent(sessionId, k -> new Object());
     }
 }

@@ -13,6 +13,8 @@ public interface PostViewRepository {
 
     Optional<PostView> findByPostId(Long postId);
 
+    void deleteByPostId(Long postId);
+
     default PostView findByPostIdOrThrow(Long postId) {
         return findByPostId(postId)
                 .orElseThrow(() -> new NotFoundException(

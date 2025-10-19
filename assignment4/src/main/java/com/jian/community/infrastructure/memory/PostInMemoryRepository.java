@@ -9,8 +9,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 @Repository
@@ -19,6 +21,7 @@ public class PostInMemoryRepository implements PostRepository {
 
     private final InMemoryRepository<Post> delegate;
     private final ConcurrentSkipListMap<LocalDateTime, Post> createdAtIndex = new ConcurrentSkipListMap<>();
+    private final Map<Long, Object> locks = new ConcurrentHashMap<>();
 
     PostInMemoryRepository(AtomicLongIdGenerator idGenerator) {
         this.delegate = new InMemoryRepository<>(idGenerator);
@@ -38,8 +41,11 @@ public class PostInMemoryRepository implements PostRepository {
 
     @Override
     public void deleteById(Long postId) {
-        removeIndices(postId);
-        delegate.deleteById(postId);
+        Object lock = lockFor(postId);
+        synchronized (lock) {
+            removeIndices(postId);
+            delegate.deleteById(postId);
+        }
     }
 
     @Override
@@ -58,8 +64,12 @@ public class PostInMemoryRepository implements PostRepository {
     }
 
     private void removeIndices(Long postId) {
-        Optional<Post> target = findById(postId);
-        if (target.isEmpty()) return;
-        createdAtIndex.remove(target.get().getCreatedAt());
+        Post target = findById(postId).orElse(null);
+        if (target == null) return;
+        createdAtIndex.remove(target.getCreatedAt());
+    }
+
+    private Object lockFor(Long postId) {
+        return locks.computeIfAbsent(postId, k -> new Object());
     }
 }
