@@ -2,17 +2,18 @@ package com.jian.community.presentation.controller;
 
 import com.jian.community.application.service.ImageService;
 import com.jian.community.presentation.dto.ImageUrlResponse;
+import com.jian.community.presentation.dto.UploadImageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "File", description = "파일 관련 API")
 @RestController
@@ -42,7 +43,7 @@ public class FileController {
                                             """)))})
     @PostMapping(value = "/profile-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ImageUrlResponse uploadProfileImages(@RequestParam("profileImage") MultipartFile profileImage) {
-        return imageService.upload(profileImage);
+    public ImageUrlResponse uploadProfileImages(@Valid @ModelAttribute UploadImageRequest request) {
+        return imageService.upload(request.image());
     }
 }

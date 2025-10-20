@@ -8,8 +8,6 @@ public class ErrorMessage {
     public static final String NICKNAME_ALREADY_EXISTS = "이미 사용 중인 닉네임입니다.";
     public static final String COMMENT_NOT_EXISTS = "댓글을 찾을 수 없습니다.";
     public static final String ACCESS_DENIED = "접근 권한이 없습니다.";
-    public static final String IMAGE_MUST_NOT_EMPTY = "비어 있는 파일은 저장할 수 없습니다.";
-    public static final String IMAGE_TOO_LARGE = "최대 5MB의 이미지 파일만 저장할 수 있습니다.";
     public static final String POST_NOT_EXISTS = "게시글을 찾을 수 없습니다.";
     public static final String POST_VIEW_NOT_EXISTS = "게시글 조회수 정보를 찾을 수 없습니다.";
     public static final String USER_NOT_EXISTS = "사용자를 찾을 수 없습니다.";

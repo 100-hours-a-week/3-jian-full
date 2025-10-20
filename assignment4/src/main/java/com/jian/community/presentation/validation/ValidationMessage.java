@@ -24,4 +24,12 @@ public class ValidationMessage {
       @Size
      */
     public static final String INVALID_POST_TITLE = "게시글 제목은 최대 26자까지 입력할 수 있습니다.";
+
+    /*
+      @ValidImage
+     */
+    public static final String INVALID_IMAGE = "유효하지 않은 이미지 파일입니다.";
+    public static final String INVALID_IMAGE_EXTENSION = "jpg, png 형식의 이미지 파일만 저장할 수 있습니다.";
+    public static final String IMAGE_MUST_NOT_EMPTY = "비어 있는 이미지 파일은 저장할 수 없습니다.";
+    public static final String IMAGE_TOO_LARGE = "최대 5MB의 이미지 파일만 저장할 수 있습니다.";
 }
