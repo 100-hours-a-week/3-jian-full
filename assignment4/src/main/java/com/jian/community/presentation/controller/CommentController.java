@@ -6,6 +6,10 @@ import com.jian.community.presentation.dto.CreateCommentRequest;
 import com.jian.community.presentation.dto.CursorResponse;
 import com.jian.community.presentation.dto.UpdateCommentRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -27,6 +31,15 @@ public class CommentController {
             description = "커서 기반 페이징 방식으로 댓글을 최대 10개씩 조회합니다. "
                     + "cursor를 입력하지 않으면 첫 페이지를 반환합니다."
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",
+                    content = @Content(
+                            examples = @ExampleObject(name = "존재하지 않는 게시글", value = """
+                                            {
+                                                "code": "POST_NOT_EXISTS",
+                                                "message": "게시글을 찾을 수 없습니다."
+                                            }
+                                            """)))})
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public CursorResponse<CommentResponse> getComments(
@@ -37,6 +50,15 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 생성")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",
+                    content = @Content(
+                            examples = @ExampleObject(name = "존재하지 않는 게시글", value = """
+                                            {
+                                                "code": "POST_NOT_EXISTS",
+                                                "message": "게시글을 찾을 수 없습니다."
+                                            }
+                                            """)))})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CommentResponse creatComment(
@@ -48,6 +70,23 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(name = "존재하지 않는 게시글", value = """
+                                            {
+                                                "code": "POST_NOT_EXISTS",
+                                                "message": "게시글을 찾을 수 없습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "존재하지 않는 댓글", value = """
+                                            {
+                                                "code": "COMMENT_NOT_EXISTS",
+                                                "message": "댓글을 찾을 수 없습니다."
+                                            }
+                                            """)
+                            }))})
     @PutMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateComment(
@@ -60,6 +99,23 @@ public class CommentController {
     }
 
     @Operation(summary = "댓글 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "404",
+                    content = @Content(
+                            examples = {
+                                    @ExampleObject(name = "존재하지 않는 게시글", value = """
+                                            {
+                                                "code": "POST_NOT_EXISTS",
+                                                "message": "게시글을 찾을 수 없습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "존재하지 않는 댓글", value = """
+                                            {
+                                                "code": "COMMENT_NOT_EXISTS",
+                                                "message": "댓글을 찾을 수 없습니다."
+                                            }
+                                            """)
+                            }))})
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(

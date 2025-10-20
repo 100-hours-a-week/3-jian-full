@@ -4,6 +4,10 @@ import com.jian.community.application.service.SessionManager;
 import com.jian.community.application.service.UserService;
 import com.jian.community.presentation.dto.CreateSessionRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +25,15 @@ public class SessionController {
     private final SessionManager sessionManager;
 
     @Operation(summary = "로그인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400",
+                    content = @Content(
+                            examples = @ExampleObject(name = "유효하지 않은 인증 정보", value = """
+                                            {
+                                                "code": "INVALID_CREDENTIALS",
+                                                "message": "인증 정보가 올바르지 않습니다."
+                                            }
+                                            """)))})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void logIn(@RequestBody CreateSessionRequest request, HttpServletResponse httpResponse) {
