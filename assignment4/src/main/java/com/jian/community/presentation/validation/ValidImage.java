@@ -1,6 +1,5 @@
 package com.jian.community.presentation.validation;
 
-import com.jian.community.application.validator.ImageValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

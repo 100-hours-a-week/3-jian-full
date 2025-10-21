@@ -1,7 +1,5 @@
-package com.jian.community.application.validator;
+package com.jian.community.presentation.validation;
 
-import com.jian.community.presentation.validation.ValidImage;
-import com.jian.community.presentation.validation.ValidationMessage;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
