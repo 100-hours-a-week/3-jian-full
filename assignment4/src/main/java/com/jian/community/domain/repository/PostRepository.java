@@ -1,9 +1,8 @@
 package com.jian.community.domain.repository;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.ResourceNotFoundException;
 import com.jian.community.domain.dto.CursorPage;
-import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.Post;
 
 import java.time.LocalDateTime;
@@ -21,9 +20,6 @@ public interface PostRepository {
 
     default Post findByIdOrThrow(Long postId) {
         return findById(postId)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.RESOURCE_NOT_FOUND,
-                        ErrorMessage.POST_NOT_EXISTS
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.POST_NOT_EXISTS));
     }
 }

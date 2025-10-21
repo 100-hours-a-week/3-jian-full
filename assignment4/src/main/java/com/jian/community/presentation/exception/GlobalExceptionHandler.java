@@ -1,6 +1,6 @@
 package com.jian.community.presentation.exception;
 
-import com.jian.community.application.exception.*;
+import com.jian.community.domain.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -40,34 +40,40 @@ public class GlobalExceptionHandler {
         return new FieldErrorResponse(code, message, field);
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(BadRequestException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
+    public ErrorResponse handleBadRequestException() {
+        return new ErrorResponse(ErrorCode.INVALID_CREDENTIALS, ErrorMessage.INVALID_CREDENTIALS);
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
+    @ExceptionHandler(SessionExpiredException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleUnauthorizedException(UnauthorizedException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
+    public ErrorResponse handleSessionExpiredException() {
+        return new ErrorResponse(ErrorCode.AUTHENTICATION_REQUIRED, ErrorMessage.INVALID_SESSION);
     }
 
-    @ExceptionHandler(ForbiddenException.class)
+    @ExceptionHandler(UnauthorizedWriterException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleForbiddenException(ForbiddenException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
+    public ErrorResponse handleForbiddenException(UnauthorizedWriterException e) {
+        return new ErrorResponse(ErrorCode.ACCESS_DENIED, e.getMessage());
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(NotFoundException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
+    public ErrorResponse handleResourceNotFound(ResourceNotFoundException e) {
+        return new ErrorResponse(ErrorCode.RESOURCE_NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+        return new ErrorResponse(ErrorCode.USER_ALREADY_EXISTS, e.getMessage());
     }
 
     @ExceptionHandler(FileStorageException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleFileStorageException(FileStorageException e) {
-        return new ErrorResponse(e.getCode(), e.getMessage());
+        return new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

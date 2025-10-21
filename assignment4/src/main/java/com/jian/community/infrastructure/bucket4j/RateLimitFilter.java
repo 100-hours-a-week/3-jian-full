@@ -1,8 +1,8 @@
 package com.jian.community.infrastructure.bucket4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
+import com.jian.community.presentation.exception.ErrorCode;
+import com.jian.community.domain.exception.ErrorMessage;
 import com.jian.community.presentation.exception.ErrorResponse;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;

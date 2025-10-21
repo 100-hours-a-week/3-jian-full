@@ -1,4 +1,4 @@
-package com.jian.community.application.exception;
+package com.jian.community.presentation.exception;
 
 public enum ErrorCode {
 

@@ -1,8 +1,6 @@
 package com.jian.community.application.service;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
-import com.jian.community.application.exception.UnauthorizedException;
+import com.jian.community.domain.exception.SessionExpiredException;
 import com.jian.community.domain.model.UserSession;
 import com.jian.community.domain.repository.UserSessionRepository;
 import jakarta.servlet.http.Cookie;
@@ -49,11 +47,7 @@ public class SessionManager {
 
         if (session.isExpired()) {
             expireSession(session.getSessionId());
-
-            throw new UnauthorizedException(
-                    ErrorCode.AUTHENTICATION_REQUIRED,
-                    ErrorMessage.INVALID_SESSION
-            );
+            throw new SessionExpiredException();
         }
 
         return extendSession(session);
@@ -63,10 +57,7 @@ public class SessionManager {
         Optional<UserSession> session = getSessionId(httpRequest)
                 .flatMap(userSessionRepository::findBySessionId);
 
-        return session.orElseThrow(() -> new UnauthorizedException(
-                ErrorCode.AUTHENTICATION_REQUIRED,
-                ErrorMessage.INVALID_SESSION
-        ));
+        return session.orElseThrow(SessionExpiredException::new);
     }
 
     public void expireSession(HttpServletRequest httpRequest) {

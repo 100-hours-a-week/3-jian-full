@@ -1,8 +1,5 @@
 package com.jian.community.domain.model;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
-import com.jian.community.application.exception.UnauthorizedException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

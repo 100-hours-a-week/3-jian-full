@@ -1,9 +1,8 @@
 package com.jian.community.domain.repository;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.ResourceNotFoundException;
 import com.jian.community.domain.dto.CursorPage;
-import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.Comment;
 
 import java.time.LocalDateTime;
@@ -24,9 +23,6 @@ public interface CommentRepository {
 
     default Comment findByIdOrThrow(Long commentId) {
         return findById(commentId)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.RESOURCE_NOT_FOUND,
-                        ErrorMessage.COMMENT_NOT_EXISTS
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.COMMENT_NOT_EXISTS));
     }
 }

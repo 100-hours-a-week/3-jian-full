@@ -1,4 +1,4 @@
-package com.jian.community.application.exception;
+package com.jian.community.domain.exception;
 
 public class ErrorMessage {
 
@@ -15,4 +15,6 @@ public class ErrorMessage {
     public static final String FILE_STORE_FAILED = "파일 저장에 실패했습니다.";
     public static final String INVALID_INPUT = "입력값이 유효하지 않습니다.";
     public static final String INTERNAL_SERVER_ERROR = "서버에서 에러가 발생했습니다.";
+    public static final String UNAUTHORIZED_POST_WRITER = "게시글 작성자에게만 권한이 있습니다.";
+    public static final String UNAUTHORIZED_COMMENT_WRITER = "댓글 작성자에게만 권한이 있습니다.";
 }

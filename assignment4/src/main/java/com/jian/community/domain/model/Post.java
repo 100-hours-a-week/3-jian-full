@@ -1,8 +1,7 @@
 package com.jian.community.domain.model;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
-import com.jian.community.application.exception.ForbiddenException;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.UnauthorizedWriterException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,11 +30,8 @@ public class Post extends MinimalEntity {
     }
 
     public void validateWriter(User writer){
-        if (userId.equals(writer.getId())) {
-            throw new ForbiddenException(
-                    ErrorCode.ACCESS_DENIED,
-                    ErrorMessage.ACCESS_DENIED
-            );
+        if (!userId.equals(writer.getId())) {
+            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_POST_WRITER);
         }
     }
 }

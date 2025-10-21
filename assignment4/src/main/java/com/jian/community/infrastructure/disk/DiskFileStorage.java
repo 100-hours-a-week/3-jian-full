@@ -1,9 +1,8 @@
 package com.jian.community.infrastructure.disk;
 
-import com.jian.community.application.exception.ErrorMessage;
+import com.jian.community.domain.exception.ErrorMessage;
 import com.jian.community.application.util.FileStorage;
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.FileStorageException;
+import com.jian.community.domain.exception.FileStorageException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,10 +40,7 @@ public class DiskFileStorage implements FileStorage {
             return targetPath.toString();
 
         } catch (IOException e) {
-            throw new FileStorageException(
-                    ErrorCode.INTERNAL_SERVER_ERROR,
-                    ErrorMessage.FILE_STORE_FAILED
-            );
+            throw new FileStorageException(ErrorMessage.FILE_STORE_FAILED);
         }
     }
 

@@ -1,8 +1,7 @@
 package com.jian.community.domain.repository;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
-import com.jian.community.application.exception.NotFoundException;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.ResourceNotFoundException;
 import com.jian.community.domain.model.PostView;
 
 import java.util.Optional;
@@ -17,9 +16,6 @@ public interface PostViewRepository {
 
     default PostView findByPostIdOrThrow(Long postId) {
         return findByPostId(postId)
-                .orElseThrow(() -> new NotFoundException(
-                        ErrorCode.RESOURCE_NOT_FOUND,
-                        ErrorMessage.POST_VIEW_NOT_EXISTS
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.POST_VIEW_NOT_EXISTS));
     }
 }

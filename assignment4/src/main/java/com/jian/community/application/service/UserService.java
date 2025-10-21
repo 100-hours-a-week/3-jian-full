@@ -1,9 +1,9 @@
 package com.jian.community.application.service;
 
-import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.util.PasswordEncoder;
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.BadRequestException;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.InvalidCredentialsException;
+import com.jian.community.domain.exception.UserAlreadyExistsException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
 import com.jian.community.presentation.dto.*;
@@ -24,10 +24,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty() || !passwordEncoder.matches(password, user.get().getPassword())) {
-            throw new BadRequestException(
-                    ErrorCode.INVALID_CREDENTIALS,
-                    ErrorMessage.INVALID_CREDENTIALS
-            );
+            throw new InvalidCredentialsException();
         }
 
         return user.get().getId();
@@ -35,17 +32,11 @@ public class UserService {
 
     public void createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail((request.email()))) {
-            throw new BadRequestException(
-                    ErrorCode.USER_ALREADY_EXISTS,
-                    ErrorMessage.EMAIL_ALREADY_EXISTS
-            );
+            throw new UserAlreadyExistsException(ErrorMessage.EMAIL_ALREADY_EXISTS);
         }
 
         if (userRepository.existsByNickname(request.nickname())) {
-            throw new BadRequestException(
-                    ErrorCode.USER_ALREADY_EXISTS,
-                    ErrorMessage.NICKNAME_ALREADY_EXISTS
-            );
+            throw new UserAlreadyExistsException(ErrorMessage.NICKNAME_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
@@ -79,10 +70,7 @@ public class UserService {
         User user = userRepository.findByIdOrThrow(userId);
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
-            throw new BadRequestException(
-                    ErrorCode.INVALID_CREDENTIALS,
-                    ErrorMessage.INVALID_CREDENTIALS
-            );
+            throw new InvalidCredentialsException();
         }
 
         String encodedPassword = passwordEncoder.encode(request.newPassword());
