@@ -18,7 +18,7 @@ public record CreatePostRequest(
         @NotBlank(message = ValidationMessage.POST_CONTENT_REQUIRED)
         String content,
 
-        @Schema(example = "http://localhost:8080//files/images/79432acd-4ce7-4e4d-ab39-84da840218e1.png")
+        @Schema(example = "[http://localhost:8080//files/images/79432acd-4ce7-4e4d-ab39-84da840218e1.png]")
         List<String> postImageUrls
 ) {
 }

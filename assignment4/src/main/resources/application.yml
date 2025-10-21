@@ -9,3 +9,6 @@ app:
 springdoc:
   override-with-generic-response: false
 
+logging:
+  level:
+    root: DEBUG
