@@ -1,4 +1,4 @@
-package com.jian.community.presentation.interceptor;
+package com.jian.community.global.interceptor;
 
 import com.jian.community.application.service.SessionManager;
 import com.jian.community.domain.model.UserSession;

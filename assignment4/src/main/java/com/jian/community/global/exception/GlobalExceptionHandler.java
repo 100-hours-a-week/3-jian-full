@@ -1,4 +1,4 @@
-package com.jian.community.presentation.exception;
+package com.jian.community.global.exception;
 
 import com.jian.community.domain.exception.*;
 import org.springframework.http.HttpStatus;

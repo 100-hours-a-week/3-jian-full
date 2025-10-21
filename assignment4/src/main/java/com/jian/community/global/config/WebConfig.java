@@ -1,7 +1,7 @@
-package com.jian.community.presentation.config;
+package com.jian.community.global.config;
 
-import com.jian.community.infrastructure.bucket4j.RateLimitFilter;
-import com.jian.community.presentation.interceptor.SessionValidationInterceptor;
+import com.jian.community.global.filter.RateLimitFilter;
+import com.jian.community.global.interceptor.SessionValidationInterceptor;
 import io.github.bucket4j.Bucket;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

@@ -1,4 +1,4 @@
-package com.jian.community.infrastructure.bucket4j;
+package com.jian.community.global.config;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
