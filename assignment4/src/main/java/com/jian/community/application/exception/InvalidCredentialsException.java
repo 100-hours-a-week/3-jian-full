@@ -1,4 +1,4 @@
-package com.jian.community.domain.exception;
+package com.jian.community.application.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
 }

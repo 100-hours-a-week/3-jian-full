@@ -1,7 +1,7 @@
 package com.jian.community.domain.repository;
 
-import com.jian.community.domain.exception.ErrorMessage;
-import com.jian.community.domain.exception.ResourceNotFoundException;
+import com.jian.community.global.exception.ErrorMessage;
+import com.jian.community.application.exception.ResourceNotFoundException;
 import com.jian.community.domain.model.PostView;
 
 import java.util.Optional;

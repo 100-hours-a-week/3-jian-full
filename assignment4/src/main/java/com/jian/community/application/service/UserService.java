@@ -1,9 +1,9 @@
 package com.jian.community.application.service;
 
 import com.jian.community.application.util.PasswordEncoder;
-import com.jian.community.domain.exception.ErrorMessage;
-import com.jian.community.domain.exception.InvalidCredentialsException;
-import com.jian.community.domain.exception.UserAlreadyExistsException;
+import com.jian.community.global.exception.ErrorMessage;
+import com.jian.community.application.exception.InvalidCredentialsException;
+import com.jian.community.application.exception.UserAlreadyExistsException;
 import com.jian.community.domain.model.User;
 import com.jian.community.domain.repository.UserRepository;
 import com.jian.community.presentation.dto.*;

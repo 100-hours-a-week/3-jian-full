@@ -2,7 +2,7 @@ package com.jian.community.global.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jian.community.global.exception.ErrorCode;
-import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.global.exception.ErrorMessage;
 import com.jian.community.global.exception.ErrorResponse;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;

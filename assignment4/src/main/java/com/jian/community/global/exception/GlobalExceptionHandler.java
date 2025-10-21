@@ -1,6 +1,10 @@
 package com.jian.community.global.exception;
 
+import com.jian.community.application.exception.InvalidCredentialsException;
+import com.jian.community.application.exception.ResourceNotFoundException;
+import com.jian.community.application.exception.UserAlreadyExistsException;
 import com.jian.community.domain.exception.*;
+import com.jian.community.infrastructure.exception.FileStorageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;

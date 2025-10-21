@@ -1,7 +1,7 @@
 package com.jian.community.application.service;
 
-import com.jian.community.domain.exception.ErrorMessage;
-import com.jian.community.domain.exception.ResourceNotFoundException;
+import com.jian.community.global.exception.ErrorMessage;
+import com.jian.community.application.exception.ResourceNotFoundException;
 import com.jian.community.domain.exception.UnauthorizedWriterException;
 import com.jian.community.domain.model.Post;
 import com.jian.community.domain.model.PostLike;

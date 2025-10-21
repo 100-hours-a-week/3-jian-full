@@ -1,7 +1,7 @@
 package com.jian.community.infrastructure.openapi;
 
 import com.jian.community.global.exception.ErrorCode;
-import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.global.exception.ErrorMessage;
 import com.jian.community.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;

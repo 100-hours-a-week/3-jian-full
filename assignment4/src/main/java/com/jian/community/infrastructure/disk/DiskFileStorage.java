@@ -1,8 +1,8 @@
 package com.jian.community.infrastructure.disk;
 
-import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.global.exception.ErrorMessage;
 import com.jian.community.application.util.FileStorage;
-import com.jian.community.domain.exception.FileStorageException;
+import com.jian.community.infrastructure.exception.FileStorageException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
