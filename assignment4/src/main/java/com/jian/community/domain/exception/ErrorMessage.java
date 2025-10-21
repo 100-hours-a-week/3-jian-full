@@ -17,4 +17,5 @@ public class ErrorMessage {
     public static final String INTERNAL_SERVER_ERROR = "서버에서 에러가 발생했습니다.";
     public static final String UNAUTHORIZED_POST_WRITER = "게시글 작성자에게만 권한이 있습니다.";
     public static final String UNAUTHORIZED_COMMENT_WRITER = "댓글 작성자에게만 권한이 있습니다.";
+    public static final String UNAUTHORIZED_POST_LIKE_USER = "게시글 좋아요 생성자에게만 권한이 있습니다.";
 }

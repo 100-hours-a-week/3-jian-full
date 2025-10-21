@@ -56,6 +56,13 @@ public class PostLikeInMemoryRepository implements PostLikeRepository {
         return List.copyOf(postLikes); // 배열 원본 보호
     }
 
+    @Override
+    public Optional<PostLike> findByPostIdAndUserId(Long postId, Long userId) {
+        PostLike postLike = postIdUserIdIndex.get(new PostUserKey(postId, userId));
+        if (postLike == null) return Optional.empty();
+        return Optional.of(postLike);
+    }
+
     public void deleteById(Long postLikeId) {
         Object lock = lockFor(postLikeId);
         synchronized (lock) {

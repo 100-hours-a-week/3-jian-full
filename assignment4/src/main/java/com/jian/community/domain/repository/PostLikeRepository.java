@@ -13,5 +13,7 @@ public interface PostLikeRepository {
 
     List<PostLike> findByPostId(Long postId);
 
+    Optional<PostLike> findByPostIdAndUserId(Long postId, Long userId);
+
     void deleteByPostIdAndUserId(Long postId, Long userId);
 }

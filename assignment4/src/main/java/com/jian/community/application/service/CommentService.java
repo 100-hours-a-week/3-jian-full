@@ -3,6 +3,9 @@ package com.jian.community.application.service;
 import com.jian.community.application.mapper.CommentDtoMapper;
 import com.jian.community.application.mapper.CursorPageMapper;
 import com.jian.community.domain.dto.CursorPage;
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.ResourceNotFoundException;
+import com.jian.community.domain.exception.UnauthorizedWriterException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.CommentRepository;
 import com.jian.community.domain.repository.PostRepository;
@@ -61,11 +64,10 @@ public class CommentService {
 
     public void updateComment(Long postId, Long commentId, Long userId, UpdateCommentRequest request) {
         Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(userId);
         Comment comment = commentRepository.findByIdOrThrow(commentId);
+        User writer = userRepository.findByIdOrThrow(userId);
 
-        comment.validatePost(post);
-        comment.validateWriter(writer);
+        validateCommandPermission(post, comment, writer);
 
         comment.update(request.content());
         commentRepository.save(comment);
@@ -73,12 +75,20 @@ public class CommentService {
 
     public void deleteComment(Long postId, Long commentId, Long userId) {
         Post post = postRepository.findByIdOrThrow(postId);
-        User writer = userRepository.findByIdOrThrow(userId);
         Comment comment = commentRepository.findByIdOrThrow(commentId);
+        User writer = userRepository.findByIdOrThrow(userId);
 
-        comment.validatePost(post);
-        comment.validateWriter(writer);
+        validateCommandPermission(post, comment, writer);
 
         commentRepository.deleteById(commentId);
+    }
+
+    private void validateCommandPermission(Post post, Comment comment, User writer) {
+        if (!comment.isBelongsTo(post)) {
+            throw new ResourceNotFoundException(ErrorMessage.POST_NOT_EXISTS);
+        }
+        if (!comment.isWrittenBy(writer)) {
+            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_COMMENT_WRITER);
+        }
     }
 }

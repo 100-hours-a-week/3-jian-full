@@ -1,7 +1,5 @@
 package com.jian.community.domain.model;
 
-import com.jian.community.domain.exception.ErrorMessage;
-import com.jian.community.domain.exception.UnauthorizedWriterException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +27,7 @@ public class Post extends MinimalEntity {
         this.postImageUrls = postImageUrls;
     }
 
-    public void validateWriter(User writer){
-        if (!userId.equals(writer.getId())) {
-            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_POST_WRITER);
-        }
+    public boolean isWrittenBy(User writer){
+        return userId.equals(writer.getId());
     }
 }

@@ -1,8 +1,5 @@
 package com.jian.community.domain.model;
 
-import com.jian.community.domain.exception.ErrorMessage;
-import com.jian.community.domain.exception.ResourceNotFoundException;
-import com.jian.community.domain.exception.UnauthorizedWriterException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,15 +27,11 @@ public class Comment extends MinimalEntity {
         this.content = content;
     }
 
-    public void validatePost(Post post) {
-        if (!postId.equals(post.getId())) {
-            throw new ResourceNotFoundException(ErrorMessage.POST_NOT_EXISTS);
-        }
+    public boolean isBelongsTo(Post post) {
+        return postId.equals(post.getId());
     }
 
-    public void validateWriter(User writer){
-        if (!userId.equals(writer.getId())) {
-            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_COMMENT_WRITER);
-        }
+    public boolean isWrittenBy(User writer){
+        return userId.equals(writer.getId());
     }
 }

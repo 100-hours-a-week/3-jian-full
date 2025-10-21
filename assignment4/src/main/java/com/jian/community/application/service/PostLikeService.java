@@ -1,5 +1,8 @@
 package com.jian.community.application.service;
 
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.ResourceNotFoundException;
+import com.jian.community.domain.exception.UnauthorizedWriterException;
 import com.jian.community.domain.model.Post;
 import com.jian.community.domain.model.PostLike;
 import com.jian.community.domain.model.User;
@@ -29,6 +32,19 @@ public class PostLikeService {
         Post post = postRepository.findByIdOrThrow(postId);
         User user = userRepository.findByIdOrThrow(userId);
 
-        postLikeRepository.deleteByPostIdAndUserId(post.getId(), user.getId());
+        postLikeRepository.findByPostIdAndUserId(postId, userId)
+                .ifPresent((postLike -> {
+                    validateCommandPermission(post, user, postLike);
+                    postLikeRepository.deleteByPostIdAndUserId(post.getId(), user.getId());
+                }));
+    }
+
+    private void validateCommandPermission(Post post, User user, PostLike postLike) {
+        if (!postLike.isBelongsTo(post)) {
+            throw new ResourceNotFoundException(ErrorMessage.POST_NOT_EXISTS);
+        }
+        if (!postLike.isLikedBy(user)) {
+            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_POST_LIKE_USER);
+        }
     }
 }

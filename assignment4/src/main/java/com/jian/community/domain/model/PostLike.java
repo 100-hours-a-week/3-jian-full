@@ -16,4 +16,12 @@ public class PostLike extends MinimalEntity {
     public static PostLike of(Long postId, Long userId) {
         return new PostLike(postId, userId);
     }
+
+    public boolean isBelongsTo(Post post) {
+        return postId.equals(post.getId());
+    }
+
+    public boolean isLikedBy(User user) {
+        return userId.equals(user.getId());
+    }
 }

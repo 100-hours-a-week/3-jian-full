@@ -1,5 +1,7 @@
 package com.jian.community.application.service;
 
+import com.jian.community.domain.exception.ErrorMessage;
+import com.jian.community.domain.exception.UnauthorizedWriterException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.*;
 import com.jian.community.presentation.dto.*;
@@ -31,21 +33,27 @@ public class PostService {
     }
 
     public void updatePost(Long userId, Long postId, UpdatePostRequest request) {
-        User writer = userRepository.findByIdOrThrow(userId);
         Post post = postRepository.findByIdOrThrow(postId);
+        User writer = userRepository.findByIdOrThrow(userId);
 
-        post.validateWriter(writer);
+        validateCommandPermission(post, writer);
 
         post.update(request.title(), request.content(), request.postImageUrls());
         postRepository.save(post);
     }
 
     public void deletePost(Long userId, Long postId) {
-        User writer = userRepository.findByIdOrThrow(userId);
         Post post = postRepository.findByIdOrThrow(postId);
+        User writer = userRepository.findByIdOrThrow(userId);
 
-        post.validateWriter(writer);
+        validateCommandPermission(post, writer);
 
         postRepository.deleteById(post.getId());
+    }
+
+    private void validateCommandPermission(Post post, User writer) {
+        if (post.isWrittenBy(writer)) {
+            throw new UnauthorizedWriterException(ErrorMessage.UNAUTHORIZED_POST_WRITER);
+        }
     }
 }
