@@ -47,7 +47,7 @@ public class SessionManager {
     public UserSession getValidSession(HttpServletRequest httpRequest) {
         UserSession session = getSession(httpRequest);
 
-        if (LocalDateTime.now().isAfter(session.getExpiresAt())) {
+        if (session.isExpired()) {
             expireSession(session.getSessionId());
 
             throw new UnauthorizedException(

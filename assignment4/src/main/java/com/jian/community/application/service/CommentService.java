@@ -1,12 +1,8 @@
 package com.jian.community.application.service;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
 import com.jian.community.application.mapper.CommentDtoMapper;
 import com.jian.community.application.mapper.CursorPageMapper;
 import com.jian.community.domain.dto.CursorPage;
-import com.jian.community.application.exception.ForbiddenException;
-import com.jian.community.application.exception.NotFoundException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.CommentRepository;
 import com.jian.community.domain.repository.PostRepository;
@@ -68,18 +64,8 @@ public class CommentService {
         User writer = userRepository.findByIdOrThrow(userId);
         Comment comment = commentRepository.findByIdOrThrow(commentId);
 
-        if (!comment.getPostId().equals(post.getId())) {
-            throw new NotFoundException(
-                    ErrorCode.RESOURCE_NOT_FOUND,
-                    ErrorMessage.COMMENT_NOT_EXISTS
-            );
-        }
-        if (!comment.getUserId().equals(writer.getId())) {
-            throw new ForbiddenException(
-                    ErrorCode.ACCESS_DENIED,
-                    ErrorMessage.ACCESS_DENIED
-            );
-        }
+        comment.validatePost(post);
+        comment.validateWriter(writer);
 
         comment.update(request.content());
         commentRepository.save(comment);
@@ -90,18 +76,8 @@ public class CommentService {
         User writer = userRepository.findByIdOrThrow(userId);
         Comment comment = commentRepository.findByIdOrThrow(commentId);
 
-        if (!comment.getPostId().equals(post.getId())) {
-            throw new NotFoundException(
-                    ErrorCode.RESOURCE_NOT_FOUND,
-                    ErrorMessage.COMMENT_NOT_EXISTS
-            );
-        }
-        if (!comment.getUserId().equals(writer.getId())) {
-            throw new ForbiddenException(
-                    ErrorCode.ACCESS_DENIED,
-                    ErrorMessage.ACCESS_DENIED
-            );
-        }
+        comment.validatePost(post);
+        comment.validateWriter(writer);
 
         commentRepository.deleteById(commentId);
     }

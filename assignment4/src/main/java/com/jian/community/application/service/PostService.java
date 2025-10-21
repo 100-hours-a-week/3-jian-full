@@ -1,8 +1,5 @@
 package com.jian.community.application.service;
 
-import com.jian.community.application.exception.ErrorCode;
-import com.jian.community.application.exception.ErrorMessage;
-import com.jian.community.application.exception.ForbiddenException;
 import com.jian.community.domain.model.*;
 import com.jian.community.domain.repository.*;
 import com.jian.community.presentation.dto.*;
@@ -36,12 +33,8 @@ public class PostService {
     public void updatePost(Long userId, Long postId, UpdatePostRequest request) {
         User writer = userRepository.findByIdOrThrow(userId);
         Post post = postRepository.findByIdOrThrow(postId);
-        if (!post.getUserId().equals(writer.getId())) {
-            throw new ForbiddenException(
-                    ErrorCode.ACCESS_DENIED,
-                    ErrorMessage.ACCESS_DENIED
-            );
-        }
+
+        post.validateWriter(writer);
 
         post.update(request.title(), request.content(), request.postImageUrls());
         postRepository.save(post);
@@ -50,12 +43,8 @@ public class PostService {
     public void deletePost(Long userId, Long postId) {
         User writer = userRepository.findByIdOrThrow(userId);
         Post post = postRepository.findByIdOrThrow(postId);
-        if (!post.getUserId().equals(writer.getId())) {
-            throw new ForbiddenException(
-                    ErrorCode.ACCESS_DENIED,
-                    ErrorMessage.ACCESS_DENIED
-            );
-        }
+
+        post.validateWriter(writer);
 
         postRepository.deleteById(post.getId());
     }

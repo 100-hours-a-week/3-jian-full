@@ -1,15 +1,6 @@
 spring:
   application:
     name: community
-  servlet:
-    multipart:
-      max-file-size: 50MB
-      max-request-size: 50MB
-
-logging:
-  level:
-    org.springframework.web: TRACE
-    root: debug
 
 app:
   image:
