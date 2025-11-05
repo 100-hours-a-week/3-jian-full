@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: test
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/db_id_generative_strategy_test?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999
+    username: root
+    password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch_size: 100
+          order_inserts: true
+          order_updates: true
+
+  output:
+    ansi:
+      enabled: always
+
+logging:
+  level:
+    root: INFO
+    com.mysql.cj.jdbc: DEBUG   # JDBC 단계 로그
+    org.hibernate.SQL: OFF
